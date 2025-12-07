@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assigned Workshops - WMS Portal</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <div>
+                    <h1 class="page-title">Assigned Workshops</h1>
+                    <p class="page-subtitle">Workshops where you are a guest speaker</p>
+                </div>
+            </div>
+
+            <div class="card fade-in">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Workshop</th>
+                            <th>Date</th>
+                            <th>Role</th>
+                            <th>Materials</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 500;">
+                                Cloud Architecture Patterns
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Main Hall A
+                                </div>
+                            </td>
+                            <td>Nov 12, 2025</td>
+                            <td><span class="badge badge-primary">Guest Speaker</span></td>
+                            <td>
+                                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        style="margin-right: 4px;">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    Upload Slides
+                                </button>
+                            </td>
+                            <td>
+                                <a href="workshop-details.html?id=5" class="btn btn-primary"
+                                    style="padding: 6px 12px;">View Page</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">
+                                System Design Interview Prep
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Auditorium B
+                                </div>
+                            </td>
+                            <td>Dec 05, 2025</td>
+                            <td><span class="badge badge-primary">Panelist</span></td>
+                            <td>
+                                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        style="margin-right: 4px;">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    Upload Slides
+                                </button>
+                            </td>
+                            <td>
+                                <a href="workshop-details.html?id=6" class="btn btn-primary"
+                                    style="padding: 6px 12px;">View Page</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/auth.js"></script>
+    <script src="/public/js/dom.js"></script>
+    <script>
+        if (!Auth.isAuthenticated() || Auth.getRole() !== 'speaker') window.location.href = '/user/login.html';
+
+        async function init() {
+            const tbody = document.querySelector('tbody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
+
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/?my_workshops=true`);
+                if (res.ok) {
+                    const workshops = await res.json();
+                    tbody.innerHTML = '';
+
+                    if (workshops.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No workshops assigned yet.</td></tr>';
+                        return;
+                    }
+
+                    workshops.forEach(w => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td style="font-weight: 500;">
+                                ${w.title}
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">${w.topic || 'General'}</div>
+                            </td>
+                            <td>${w.start_date || 'TBA'}</td>
+                            <td><span class="badge badge-primary">Speaker</span></td>
+                            <td>
+                                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;" onclick="alert('Upload Placeholder')">
+                                    Upload Slides
+                                </button>
+                            </td>
+                            <td>
+                                <a href="workshop-details.html?id=${w.id}" class="btn btn-primary" style="padding: 6px 12px;">View Page</a>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="5" style="color:red; text-align:center;">Error loading data</td></tr>';
+            }
+        }
+        init();
+    </script>
+</body>
+
+</html>

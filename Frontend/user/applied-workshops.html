@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applied Workshops - WMS Student</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <h1 class="page-title">My Applications</h1>
+                <p class="page-subtitle">Track status of your registered workshops.</p>
+            </div>
+
+            <div class="grid-2 stagger-children">
+
+                <!-- Applied Item 1 -->
+                <div class="card" style="display: flex; gap: 24px; align-items: flex-start;">
+                    <div
+                        style="width: 100px; height: 100px; background: #1e293b; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.5rem;">
+                        React
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <h3 style="font-size: 1.2rem; font-weight: 600;">Modern React Patterns</h3>
+                            <span class="badge badge-success">Confirmed</span>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                            Starts in 2 days. Prepare your environment.
+                        </p>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-outline"
+                                style="padding: 0 16px; height: 36px; min-height: 36px;">View Details</button>
+                            <button class="btn btn-primary"
+                                style="padding: 0 16px; height: 36px; min-height: 36px;">Ticket QR</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applied Item 2 -->
+                <div class="card" style="display: flex; gap: 24px; align-items: flex-start;">
+                    <div
+                        style="width: 100px; height: 100px; background: #1e293b; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.5rem;">
+                        UX
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <h3 style="font-size: 1.2rem; font-weight: 600;">Advanced UX Research</h3>
+                            <span class="badge badge-warning">Waitlist</span>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                            You are #4 on the waitlist.
+                        </p>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-outline"
+                                style="padding: 0 16px; height: 36px; min-height: 36px;">View Details</button>
+                            <button class="btn btn-outline"
+                                style="padding: 0 16px; height: 36px; min-height: 36px; opacity: 0.5; cursor: not-allowed;">Ticket
+                                QR</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        async function loadComponents() {
+            const sidebarRes = await fetch('/components/sidebar-student.html');
+            document.getElementById('sidebar').innerHTML = await sidebarRes.text();
+
+            const navbarRes = await fetch('/components/user-navbar.html');
+            document.getElementById('navbar').innerHTML = await navbarRes.text();
+        }
+        loadComponents();
+    </script>
+</body>
+
+</html>

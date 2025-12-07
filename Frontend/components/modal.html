@@ -1,0 +1,25 @@
+<!-- Modal Template (Hidden by default) -->
+<div id="default-modal"
+    style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center;">
+    <div class="card" style="width: 100%; max-width: 500px; animation: slideInLeft 0.3s ease-out;">
+        <div class="card-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 class="card-title">Modal Title</h3>
+            <button onclick="document.getElementById('default-modal').style.display='none'"
+                style="color: var(--text-muted);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg></button>
+        </div>
+        <div class="card-body" style="margin-bottom: 24px;">
+            <p style="color: var(--text-muted);">This is a modal description. You can place forms or information here.
+            </p>
+        </div>
+        <div class="card-footer" style="display: flex; justify-content: flex-end; gap: 12px;">
+            <button class="btn btn-outline"
+                onclick="document.getElementById('default-modal').style.display='none'">Cancel</button>
+            <button class="btn btn-primary">Confirm Action</button>
+        </div>
+    </div>
+</div>

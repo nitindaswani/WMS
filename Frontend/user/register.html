@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - WMS Portal</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f172a 0%, #000000 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="auth-container">
+        <div class="card card-glass auth-card fade-in">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 8px;">Create Account</h1>
+                <p style="color: var(--text-muted);">Select your role to get started</p>
+            </div>
+
+            <form action="login.html">
+                <!-- Role Selector Component Placeholder -->
+                <div id="role-selector-placeholder"></div>
+
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" placeholder="Jane Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" placeholder="you@example.com" required>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-input" placeholder="+1234567890">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Occupation</label>
+                        <input type="text" class="form-input" placeholder="Student / Dev">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label
+                        style="display: flex; align-items: flex-start; gap: 10px; color: var(--text-muted); font-size: 0.85rem; cursor: pointer;">
+                        <input type="checkbox" required style="accent-color: var(--primary); margin-top: 3px;">
+                        <span>I agree to the <a href="#" style="color: var(--text-main);">Terms of Service</a> and <a
+                                href="#" style="color: var(--text-main);">Privacy Policy</a>.</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Sign Up</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 24px; color: var(--text-muted); font-size: 0.9rem;">
+                Already have an account? <a href="login.html" style="color: var(--teal); font-weight: 600;">Log In</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Role Selector Component -->
+    <script>
+        fetch('/components/role-selector.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('role-selector-placeholder').innerHTML = html;
+
+                // Re-attach script logic if needed (simple onclicks work)
+                // The loaded HTML has inline onclick attributes which work fine.
+            });
+    </script>
+
+</body>
+
+</html>

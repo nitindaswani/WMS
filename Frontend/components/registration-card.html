@@ -1,0 +1,35 @@
+<!-- Registration Card -->
+<div class="card float-hover">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <h4 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 4px;">React Masterclass</h4>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Started Oct 12, 2025</div>
+        </div>
+        <span class="badge badge-success">Confirmed</span>
+    </div>
+    <div style="margin: 16px 0;">
+        <div
+            style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            10:00 AM - 04:00 PM
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            Tech Park, Hall A
+        </div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+        <a href="/user/workshop-details.html?id=1" class="btn btn-outline" style="flex: 1; font-size: 0.85rem;">View
+            Details</a>
+        <button onclick="showQR(__REG_ID__)" class="btn btn-primary" style="flex: 1; font-size: 0.85rem;">Ticket
+            QR</button>
+    </div>
+</div>

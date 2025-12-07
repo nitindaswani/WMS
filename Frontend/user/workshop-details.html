@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workshop Details - WMS Portal</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="fade-in">
+                <a href="workshops.html"
+                    style="color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-bottom: 24px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Workshops
+                </a>
+
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <!-- Cover Image Placeholder -->
+                    <div
+                        style="height: 200px; background: linear-gradient(135deg, #3A7BFF, #2962FF); display: flex; align-items: center; justify-content: center;">
+                        <h1 style="font-size: 3rem; color: rgba(255,255,255,0.2); font-weight: 800;">REACT</h1>
+                    </div>
+
+                    <div style="padding: 32px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                            <div>
+                                <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 8px;">Modern React Patterns
+                                </h1>
+                                <p style="color: var(--text-muted);">Instructor: <span
+                                        style="color: var(--primary);">Dr. Angela Yu</span></p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--teal);">$49.99</div>
+                                <span class="badge badge-success">Open for Registration</span>
+                            </div>
+                        </div>
+
+                        <div class="grid-3" style="margin-bottom: 32px; gap: 16px;">
+                            <div
+                                style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: var(--radius-md);">
+                                <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Date &
+                                    Time</div>
+                                <div style="font-weight: 600;">Oct 12, 10:00 AM</div>
+                            </div>
+                            <div
+                                style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: var(--radius-md);">
+                                <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Duration
+                                </div>
+                                <div style="font-weight: 600;">6 Hours</div>
+                            </div>
+                            <div
+                                style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: var(--radius-md);">
+                                <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">Location
+                                </div>
+                                <div style="font-weight: 600;">Main Hall A</div>
+                            </div>
+                        </div>
+
+                        <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 12px;">About this Workshop</h2>
+                        <p style="color: var(--text-main); line-height: 1.6; max-width: 800px; margin-bottom: 32px;">
+                            Join us for an intensive deep dive into modern React development. We will cover server
+                            components, suspense, concurrent mode, and advanced state management patterns. Perfect for
+                            developers looking to upgrade their skills to React 19.
+                        </p>
+
+                        <div style="display: flex; gap: 16px;">
+                            <button class="btn btn-primary pulse-glow"
+                                onclick="alert('Proceeding to payment...')">Register as Student</button>
+                            <button class="btn btn-outline" style="border-color: var(--accent); color: var(--accent);"
+                                onclick="alert('Request sent to admin.')">Apply as Guest Speaker</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        async function loadComponents() {
+            const sidebarRes = await fetch('/components/user-sidebar.html');
+            document.getElementById('sidebar').innerHTML = await sidebarRes.text();
+
+            const navbarRes = await fetch('/components/user-navbar.html');
+            document.getElementById('navbar').innerHTML = await navbarRes.text();
+        }
+        loadComponents();
+    </script>
+</body>
+
+</html>

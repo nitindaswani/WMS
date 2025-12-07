@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Workshop - WMS Pro</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <div>
+                    <h1 class="page-title">Create New Workshop</h1>
+                    <p class="page-subtitle">Set up details, dates, and budget for your new event.</p>
+                </div>
+            </div>
+
+            <div class="card fade-in" style="max-width: 800px;">
+                <form id="createWorkshopForm" onsubmit="handleCreateWorkshop(event)">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Workshop Title</label>
+                            <input type="text" name="title" class="form-input"
+                                placeholder="e.g. Advanced Web Development" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-input">
+                                <option value="Technology">Technology</option>
+                                <option value="Business">Business</option>
+                                <option value="Soft Skills">Soft Skills</option>
+                                <option value="AI / ML">AI / ML</option>
+                                <option value="Cloud">Cloud</option>
+                                <option value="Programming">Programming</option>
+                                <option value="Design">Design</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-input" rows="4"
+                            placeholder="Brief overview of the workshop content..."></textarea>
+                    </div>
+
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="start_date" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">End Date</label>
+                            <input type="date" name="end_date" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Capacity</label>
+                            <input type="number" name="seat_limit" class="form-input" placeholder="50" required>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Allocated Budget ($)</label>
+                            <input type="number" name="budget" class="form-input" placeholder="1000.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Venue / Link</label>
+                            <input type="text" name="venue" class="form-input" placeholder="Room 101 or Zoom Link">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 32px; display: flex; gap: 16px;">
+                        <button type="submit" class="btn btn-primary">Create Workshop</button>
+                        <button type="button" class="btn btn-outline" onclick="history.back()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/auth.js"></script>
+    <script src="/public/js/dom.js"></script>
+    <script>
+        async function handleCreateWorkshop(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.textContent = 'Saving...';
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            // Ensure numeric types
+            data.seat_limit = parseInt(data.seat_limit);
+            data.budget = parseFloat(data.budget);
+
+            try {
+                const response = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/`, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Workshop Created Successfully!');
+                    window.location.href = 'workshop-list.html';
+                } else {
+                    const err = await response.json();
+                    alert('Error: ' + JSON.stringify(err));
+                    btn.textContent = 'Create Workshop';
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Network Error');
+                btn.textContent = 'Create Workshop';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan QR - WMS Admin</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+    <!-- QR Scanner Lib -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <div>
+                    <h1 class="page-title">Scan Attendance</h1>
+                    <p class="page-subtitle">Scan tickets to mark attendance.</p>
+                </div>
+            </div>
+
+            <div class="grid-2 fade-in">
+                <!-- Scanner -->
+                <div class="card">
+                    <h3 class="card-title">Camera</h3>
+                    <div id="reader" style="width: 100%; min-height: 300px; background: black; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <!-- Result -->
+                <div class="card">
+                    <h3 class="card-title">Scan Result</h3>
+                    <div id="scanResult" style="margin-top: 16px; text-align: center;">
+                        <p style="color: var(--text-muted);">Waiting for scan...</p>
+                    </div>
+
+                    <!-- Optional Session Select -->
+                    <div class="form-group" style="margin-top: 24px;">
+                        <label class="form-label">Mark for Specific Session (Optional)</label>
+                        <select id="sessionSelect" class="form-input">
+                            <option value="">-- General Workshop Attendance --</option>
+                        </select>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                            If selected, attendance is marked for this session. Otherwise, marked for the workshop day.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/auth.js"></script>
+    <script src="/public/js/dom.js"></script>
+    <script>
+        if (!Auth.isAuthenticated() || Auth.getRole() !== 'admin') window.location.href = '/admin/login.html';
+
+        // Load Sessions for broader context (optional)
+        async function loadSessions() {
+            // Ideally we'd show active workshops first, but let's list all for now or empty
+            // For MVP, letting admin assume General Attendance is safer.
+        }
+
+        async function onScanSuccess(decodedText, decodedResult) {
+            // Stop scanning temporarily?
+            // html5QrcodeScanner.clear(); 
+
+            const resultDiv = document.getElementById('scanResult');
+            resultDiv.innerHTML = '<p style="color: var(--primary);">Processing...</p>';
+
+            try {
+                const body = { qr_content: decodedText };
+                const sessionId = document.getElementById('sessionSelect').value;
+                if (sessionId) body.session_id = sessionId;
+
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/attendance/mark/`, {
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    resultDiv.innerHTML = `
+                        <div style="background: rgba(0, 255, 136, 0.1); padding: 16px; border-radius: 8px; border: 1px solid var(--success);">
+                            <h4 style="color: var(--success); font-weight: 700;">MARKED PRESENT</h4>
+                            <p style="margin-top: 8px;">${data.registration ? 'Reg ID: ' + data.registration : 'Success'}</p>
+                            <p style="font-size: 0.8rem; opacity: 0.8;">${new Date().toLocaleTimeString()}</p>
+                        </div>
+                    `;
+                    // Play success sound?
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="background: rgba(255, 62, 62, 0.1); padding: 16px; border-radius: 8px; border: 1px solid var(--danger);">
+                            <h4 style="color: var(--danger); font-weight: 700;">ERROR</h4>
+                            <p style="margin-top: 8px;">${data.error || 'Invalid QR'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error(error);
+                resultDiv.innerHTML = '<p style="color: var(--danger);">Network Error</p>';
+            }
+        }
+
+        function onScanFailure(error) {
+            // handle scan failure, usually better to ignore and keep scanning.
+            // console.warn(`Code scan error = ${error}`);
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader",
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            /* verbose= */ false);
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    </script>
+
+</body>
+
+</html>

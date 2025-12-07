@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Certificates - WMS Portal</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <h1 class="page-title">My Certificates</h1>
+            </div>
+
+            <div class="grid-3 stagger-children">
+                <div id="cert-card-1"></div>
+                <div id="cert-card-2"></div>
+                <div id="cert-card-3"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        async function loadComponents() {
+            const sidebarRes = await fetch('/components/user-sidebar.html');
+            document.getElementById('sidebar').innerHTML = await sidebarRes.text();
+
+            const navbarRes = await fetch('/components/user-navbar.html');
+            document.getElementById('navbar').innerHTML = await navbarRes.text();
+
+            const certCardRes = await fetch('/components/certificate-card.html');
+            const certCardHtml = await certCardRes.text();
+
+            document.getElementById('cert-card-1').innerHTML = certCardHtml;
+            document.getElementById('cert-card-2').innerHTML = certCardHtml.replace('Introduction to UI/UX', 'Advanced Javascript').replace('Oct 15, 2025', 'Sep 20, 2025');
+            document.getElementById('cert-card-3').innerHTML = certCardHtml.replace('Introduction to UI/UX', 'Python for Beginners').replace('Oct 15, 2025', 'Aug 05, 2025');
+        }
+        loadComponents();
+    </script>
+</body>
+
+</html>

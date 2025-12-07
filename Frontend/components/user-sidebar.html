@@ -1,0 +1,93 @@
+<div class="sidebar-brand" style="padding: 24px 20px; margin-bottom: 0;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="icon" style="color: var(--teal);">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+    </svg>
+    <span style="font-size: 1.1rem; font-weight: 700;">WMS Portal</span>
+</div>
+
+<nav class="sidebar-nav" style="padding: 0 20px; display: flex; flex-direction: column; gap: 14px;">
+    <div class="nav-group-title" style="margin-bottom: 8px; margin-top: 12px; padding-left: 0;">Menu</div>
+    <a href="/user/dashboard.html" class="nav-link" style="padding: 10px 12px; font-size: 0.95rem; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        Dashboard
+    </a>
+    <a href="/user/workshops.html" class="nav-link" style="padding: 10px 12px; font-size: 0.95rem; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        Browse Workshops
+    </a>
+
+    <div class="nav-group-title" style="margin-bottom: 8px; margin-top: 22px; padding-left: 0;">My Learning</div>
+    <a href="/user/my-registrations.html" class="nav-link" style="padding: 10px 12px; font-size: 0.95rem; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        Registrations
+    </a>
+    <a href="/user/my-certificates.html" class="nav-link" style="padding: 10px 12px; font-size: 0.95rem; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="7"></circle>
+            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+        </svg>
+        Certificates
+    </a>
+
+    <!-- Speaker Only Section -->
+    <div id="speaker-menu" style="display: none; flex-direction: column; gap: 14px;">
+        <div class="nav-group-title"
+            style="color: var(--accent); margin-bottom: 8px; margin-top: 22px; padding-left: 0;">Speaker Zone</div>
+        <a href="/user/speaker-workshops.html" class="nav-link"
+            style="padding: 10px 12px; font-size: 0.95rem; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            Assigned Workshops
+        </a>
+        <a href="/user/speaker-profile.html" class="nav-link" style="padding: 10px 12px; font-size: 0.95rem; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Speaker Profile
+        </a>
+        <a href="/user/live-sessions.html" class="nav-link" style="padding: 10px 12px; font-size: 0.95rem; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            Live Session
+        </a>
+    </div>
+
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+        <a href="#" onclick="Auth.logout()" class="nav-link"
+            style="color: var(--danger); padding: 10px 12px; font-size: 0.95rem; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+        </a>
+    </div>
+</nav>

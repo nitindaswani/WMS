@@ -1,0 +1,67 @@
+:root {
+    /* Brand Colors - Neon & Electric */
+    --primary: #3A7BFF;
+    /* Electric Blue */
+    --primary-glow: rgba(58, 123, 255, 0.4);
+
+    --accent: #9D4BFF;
+    /* Neon Purple */
+    --accent-glow: rgba(157, 75, 255, 0.4);
+
+    --teal: #00FFC6;
+    /* Teal Accent */
+    --teal-glow: rgba(0, 255, 198, 0.4);
+
+    --success: #00E676;
+    --warning: #FFC107;
+    --danger: #FF3D00;
+
+    /* Backgrounds */
+    --bg-dark: #0B0F19;
+    /* Deepest Dark */
+    --bg-card: #111726;
+    /* Lighter Card Bg */
+    --bg-glass: rgba(17, 23, 38, 0.7);
+    /* Glass Card */
+
+    /* Text */
+    --text-main: #E0E6ED;
+    --text-muted: #94A3B8;
+    --text-highlight: #FFFFFF;
+
+    /* Borders */
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-glow: rgba(66, 153, 225, 0.3);
+
+    /* Spacing & Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+
+    /* Sizing & Layout */
+    --nav-height: 70px;
+    --sidebar-width: 260px;
+    --container-padding: 32px;
+    --card-padding: 20px;
+    --btn-height: 44px;
+    --input-height: 48px;
+
+    /* Transitions */
+    --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+    --transition-fast: 0.2s var(--ease-out);
+    --transition-normal: 0.3s var(--ease-out);
+
+    /* Fonts */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Dark Styling by default */
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+}

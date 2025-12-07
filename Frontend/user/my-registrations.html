@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Registrations - WMS Portal</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <h1 class="page-title">My Registrations</h1>
+            </div>
+
+            <div id="modal-container"></div>
+
+            <div class="grid-2 fade-in" id="registrations-grid">
+                <!-- Dynamic Content Loading -->
+                <p style="color: var(--text-muted);">Loading registrations...</p>
+            </div>
+
+            <div class="card" style="margin-top: 32px; text-align: center; padding: 40px; color: var(--text-muted);">
+                <p>Looking for past events? <a href="#" style="color: var(--primary);">View History</a></p>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/auth.js"></script>
+    <script src="/public/js/dom.js"></script>
+    <script>
+        async function loadPage() {
+            // Check Auth
+            if (!Auth.isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Load Modal Component
+            const modalRes = await fetch('/components/modal.html');
+            document.getElementById('modal-container').innerHTML = await modalRes.text();
+
+            // Fetch Registrations
+            try {
+                const response = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/user/registrations/`);
+                if (response.ok) {
+                    const registrations = await response.json();
+                    renderRegistrations(registrations);
+                } else {
+                    document.getElementById('registrations-grid').innerHTML = '<p>Failed to load registrations.</p>';
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('registrations-grid').innerHTML = '<p>Error loading data.</p>';
+            }
+        }
+
+        async function renderRegistrations(registrations) {
+            const grid = document.getElementById('registrations-grid');
+            grid.innerHTML = '';
+
+            if (registrations.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-muted);">No active registrations found.</p>';
+                return;
+            }
+
+            const cardTemplateRes = await fetch('/components/registration-card.html');
+            const cardTemplate = await cardTemplateRes.text();
+
+            registrations.forEach(reg => {
+                let card = cardTemplate;
+                // Replace placeholders
+                card = card.replace('React Masterclass', reg.workshop_title || 'Unknown Workshop');
+                // Use a proper date formatter in real app
+                card = card.replace('Started Oct 12, 2025', `Date: ${reg.workshop.start_date || 'TBA'}`);
+                card = card.replace('Confirmed', 'Registered');
+                card = card.replace('10:00 AM - 04:00 PM', 'Time: TBA'); // Add time to serializer if needed
+                card = card.replace('Tech Park, Hall A', 'Venue: TBD');
+
+                // Replace ID for links/buttons
+                // Link to workshop details
+                card = card.replace('href="/user/workshop-details.html?id=1"', `href="/user/workshop-details.html?id=${reg.workshop}"`);
+
+                // Replace __REG_ID__ for QR
+                // Use regex to replace all occurrences if needed, but here simple replace works for one instance
+                card = card.replace('__REG_ID__', reg.id);
+
+                const div = document.createElement('div');
+                div.innerHTML = card;
+                grid.appendChild(div);
+            });
+        }
+
+        // QR Function
+        function showQR(regId) {
+            const modal = document.getElementById('default-modal');
+            const title = modal.querySelector('.card-title');
+            const body = modal.querySelector('.card-body');
+            const footer = modal.querySelector('.card-footer');
+
+            title.innerText = 'Your Entry Ticket';
+            body.innerHTML = `
+                <div style="text-align: center;">
+                    <p style="margin-bottom: 16px; color: var(--text-muted);">Scan this QR code at the venue entrance.</p>
+                    <img src="${CONFIG.API_BASE_URL}/attendance/qr/${regId}/" alt="QR Code" 
+                         style="width: 200px; height: 200px; border-radius: 8px; border: 4px solid white;">
+                </div>
+            `;
+            // Hide footer or change buttons
+            footer.style.display = 'none';
+
+            modal.style.display = 'flex';
+        }
+
+        loadPage();
+    </script>
+</body>
+
+</html>

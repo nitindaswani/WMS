@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - WMS Pro</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <!-- Navbar -->
+            <div id="navbar"></div>
+
+            <!-- Page Header -->
+            <div class="section-header fade-in">
+                <div>
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Welcome back, Admin. Here's what's happening today.</p>
+                </div>
+                <button class="btn btn-primary" onclick="window.location.href='create-workshop.html'">
+                    <svg class="icon">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Create Workshop
+                </button>
+            </div>
+
+            <!-- Metrics Grid -->
+            <section class="grid-4 stagger-children">
+                <!-- Total Workshops -->
+                <div class="card stat-card float-hover">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div
+                            style="padding: 10px; background: rgba(58, 123, 255, 0.1); border-radius: 10px; color: var(--primary);">
+                            <svg class="icon">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="stat-workshops"
+                        style="font-size: 2rem; font-weight: 700; color: var(--text-highlight); margin-bottom: 4px;">-
+                    </div>
+                    <div class="stat-label" style="color: var(--text-muted);">Active Workshops</div>
+                </div>
+
+                <!-- Total Participants -->
+                <div class="card stat-card float-hover">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div
+                            style="padding: 10px; background: rgba(157, 75, 255, 0.1); border-radius: 10px; color: var(--accent);">
+                            <svg class="icon">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="stat-participants"
+                        style="font-size: 2rem; font-weight: 700; color: var(--text-highlight); margin-bottom: 4px;">-
+                    </div>
+                    <div class="stat-label" style="color: var(--text-muted);">Total Participants</div>
+                </div>
+
+                <!-- Budget -->
+                <div class="card stat-card float-hover">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div
+                            style="padding: 10px; background: rgba(0, 255, 198, 0.1); border-radius: 10px; color: var(--teal);">
+                            <svg class="icon">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="stat-budget"
+                        style="font-size: 2rem; font-weight: 700; color: var(--text-highlight); margin-bottom: 4px;">
+                        $0</div>
+                    <div class="stat-label" style="color: var(--text-muted);">Budget Utilization</div>
+                </div>
+
+                <!-- Rating -->
+                <div class="card stat-card float-hover">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div
+                            style="padding: 10px; background: rgba(255, 193, 7, 0.1); border-radius: 10px; color: var(--warning);">
+                            <svg class="icon">
+                                <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                                </polygon>
+                            </svg>
+                        </div>
+                        <span class="badge badge-success">4.8</span>
+                    </div>
+                    <div class="stat-value"
+                        style="font-size: 2rem; font-weight: 700; color: var(--text-highlight); margin-bottom: 4px;">
+                        High</div>
+                    <div class="stat-label" style="color: var(--text-muted);">Avg Satisfaction</div>
+                </div>
+            </section>
+
+            <!-- Main Grid: Charts & List -->
+            <section class="grid-2 fade-in"
+                style="grid-template-columns: 2fr 1fr; animation-delay: 0.3s; margin-top: 24px;">
+                <!-- Main Chart Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Registration Trends</h3>
+                    </div>
+                    <div
+                        style="height: 300px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: var(--radius-md);">
+                        <p style="color: var(--text-muted);">[Chart Placeholder: Registrations per Month]</p>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Upcoming Workshops</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 16px;" id="upcoming-container">
+                        <!-- Items -->
+                        <div style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</div>
+                    </div>
+                    <a href="workshop-list.html"
+                        style="font-size: 0.9rem; color: var(--primary); text-align: center; margin-top: 8px;">View
+                        All Workshops</a>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/auth.js"></script>
+    <script src="/public/js/dom.js"></script>
+    <script>
+        // Auth Check
+        if (!Auth.isAuthenticated() || Auth.getRole() !== 'admin') {
+            window.location.href = 'login.html';
+        }
+
+        // Dynamic Profile Load
+        const fullName = localStorage.getItem('user_full_name') || 'Admin';
+        document.querySelector('.page-subtitle').innerText = `Welcome back, ${fullName}. Here's what's happening today.`;
+
+        async function loadDashboard() {
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/analytics/`);
+                if (res.ok) {
+                    const data = await res.json();
+                    updateStats(data);
+                    updateUpcoming(data.upcoming);
+                }
+            } catch (e) {
+                console.error("Dashboard Load Error", e);
+            }
+        }
+
+        function updateStats(data) {
+            const workshopsEl = document.getElementById('stat-workshops');
+            const participantsEl = document.getElementById('stat-participants');
+            const budgetEl = document.getElementById('stat-budget');
+
+            if (workshopsEl) workshopsEl.innerText = data.total_workshops || 0;
+            if (participantsEl) participantsEl.innerText = data.total_participants || 0;
+            if (budgetEl) budgetEl.innerText = '$' + (data.budget_utilized || 0);
+        }
+
+        function updateUpcoming(list) {
+            const container = document.getElementById('upcoming-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:var(--text-muted);">No upcoming workshops</div>';
+                return;
+            }
+
+            list.forEach(item => {
+                const date = new Date(item.start_date);
+                const month = date.toLocaleString('default', { month: 'short' });
+                const day = date.getDate();
+
+                const div = document.createElement('div');
+                div.className = 'float-hover'; // Add hover effect
+                div.style.display = 'flex';
+                div.style.gap = '16px';
+                div.style.alignItems = 'center';
+                div.style.padding = '12px';
+                div.style.background = 'rgba(255,255,255,0.02)';
+                div.style.borderRadius = '12px';
+                div.style.cursor = 'pointer';
+                div.style.transition = 'background 0.2s';
+
+                div.onmouseover = () => div.style.background = 'rgba(255,255,255,0.05)';
+                div.onmouseout = () => div.style.background = 'rgba(255,255,255,0.02)';
+                div.onclick = () => window.location.href = `workshop-details.html?id=${item.id}`; // Assuming detail page exists or list
+
+                div.innerHTML = `
+                   <div style="width: 48px; height: 48px; background: rgba(58, 123, 255, 0.15); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--primary); font-weight: 700; flex-shrink:0;">
+                       <span style="font-size: 0.75rem; text-transform: uppercase;">${month}</span>
+                       <span style="font-size: 1.1rem; line-height:1;">${day}</span>
+                   </div>
+                   <div>
+                       <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-highlight); margin-bottom: 4px;">${item.title}</h4>
+                       <span class="badge badge-sm" style="background: rgba(255,255,255,0.1); color: var(--text-muted); padding: 2px 8px; font-size: 0.75rem;">${item.category || 'Workshop'}</span>
+                   </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+</body >
+
+</html >

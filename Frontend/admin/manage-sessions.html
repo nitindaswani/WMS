@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Sessions - WMS Admin</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+    <style>
+        /* Custom Dropdown Styling */
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            background-color: var(--bg-card);
+            color: var(--text-color);
+            padding-right: 2.5rem;
+            /* Space for arrow */
+        }
+
+        select.form-input option {
+            background-color: var(--bg-card);
+            color: var(--text-color);
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <div>
+                    <h1 class="page-title">Manage Sessions</h1>
+                    <p class="page-subtitle">Create and organize workshop sessions.</p>
+                </div>
+            </div>
+
+            <div class="grid-2 fade-in">
+                <!-- Select Workshop -->
+                <div class="card">
+                    <h3 class="card-title">Select Workshop</h3>
+                    <div class="form-group">
+                        <select id="workshopSelect" class="form-input" onchange="loadSessions(this.value)">
+                            <option value="">Loading workshops...</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" onclick="showCreateModal()">
+                        + Add New Session
+                    </button>
+                </div>
+
+                <!-- Session Stats or Info -->
+                <div class="card">
+                    <h3 class="card-title">Session Overview</h3>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--primary);" id="sessionCount">0</div>
+                    <div style="color: var(--text-muted);">Sessions in this workshop</div>
+                </div>
+            </div>
+
+            <!-- Sessions List -->
+            <div id="sessions-container" class="fade-in" style="margin-top: 24px;">
+                <h3 style="margin-bottom: 16px;">Existing Sessions</h3>
+                <div id="sessions-grid" class="grid-1" style="gap: 16px;">
+                    <p style="color: var(--text-muted);">Select a workshop to view sessions.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div id="sessionModal"
+        style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center;">
+        <div class="card" style="width: 100%; max-width: 500px; animation: slideInLeft 0.3s ease-out;">
+            <div class="card-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 class="card-title" id="modalTitle">Add Session</h3>
+                <button onclick="closeModal()"
+                    style="color: var(--text-muted); background:none; border:none; cursor:pointer;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="sessionForm" onsubmit="handleSaveSession(event)">
+                <input type="hidden" id="sessionId">
+                <div class="form-group">
+                    <label class="form-label">Session Title</label>
+                    <input type="text" id="sessionTitle" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="sessionDesc" class="form-input" rows="3"></textarea>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" id="startTime" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time</label>
+                        <input type="time" id="endTime" class="form-input" required>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Day</label>
+                        <input type="text" id="day" class="form-input" placeholder="e.g. Day 1 / Monday">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mode</label>
+                        <select id="mode" class="form-input">
+                            <option value="offline">Offline</option>
+                            <option value="online">Online</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Save
+                    Session</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/auth.js"></script>
+    <script src="/public/js/dom.js"></script>
+    <script>
+        if (!Auth.isAuthenticated() || Auth.getRole() !== 'admin') window.location.href = '/admin/login.html';
+
+        let currentWorkshopId = null;
+
+        async function loadWorkshops() {
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/`);
+                if (res.ok) {
+                    const workshops = await res.json();
+                    const select = document.getElementById('workshopSelect');
+                    select.innerHTML = '<option value="">Select a Workshop...</option>';
+                    workshops.forEach(w => {
+                        const opt = document.createElement('option');
+                        opt.value = w.id;
+                        opt.textContent = w.title;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        loadWorkshops();
+
+        async function loadSessions(workshopId) {
+            currentWorkshopId = workshopId;
+            const container = document.getElementById('sessions-grid');
+            const countDisplay = document.getElementById('sessionCount');
+
+            if (!workshopId) {
+                container.innerHTML = '<p style="color: var(--text-muted);">Select a workshop to view sessions.</p>';
+                countDisplay.innerText = '0';
+                return;
+            }
+
+            container.innerHTML = 'Loading...';
+
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/${workshopId}/sessions/`);
+                if (res.ok) {
+                    const sessions = await res.json();
+                    countDisplay.innerText = sessions.length;
+
+                    if (sessions.length === 0) {
+                        container.innerHTML = '<p style="color: var(--text-muted);">No sessions yet. Create one!</p>';
+                        return;
+                    }
+
+                    container.innerHTML = '';
+                    sessions.forEach(s => {
+                        const div = document.createElement('div');
+                        div.className = 'card';
+                        div.style.display = 'flex';
+                        div.style.justifyContent = 'space-between';
+                        div.style.alignItems = 'center';
+                        div.innerHTML = `
+                            <div>
+                                <h4 style="font-weight: 600; font-size: 1.1rem; color:white;">${s.session_title}</h4>
+                                <div style="color: var(--text-muted); font-size: 0.9rem;">
+                                    ${s.start_time} - ${s.end_time} | ${s.day_of_week} | ${s.mode}
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick='editSession(${JSON.stringify(s)})'>Edit</button>
+                                <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem; border-color: var(--danger); color: var(--danger);" onclick="deleteSession(${s.id})">Delete</button>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = 'Error loading sessions';
+            }
+        }
+
+        // Modal Logic
+        function showCreateModal() {
+            if (!currentWorkshopId) {
+                alert("Please select a workshop first");
+                return;
+            }
+            document.getElementById('modalTitle').innerText = 'Add Session';
+            document.getElementById('sessionId').value = '';
+            document.getElementById('sessionForm').reset();
+            document.getElementById('sessionModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('sessionModal').style.display = 'none';
+        }
+
+        function editSession(session) {
+            document.getElementById('modalTitle').innerText = 'Edit Session';
+            document.getElementById('sessionId').value = session.id;
+            document.getElementById('sessionTitle').value = session.session_title;
+            document.getElementById('sessionDesc').value = session.description;
+            document.getElementById('startTime').value = session.start_time; // Format 'HH:MM:SS' matches input type='time' usually
+            document.getElementById('endTime').value = session.end_time;
+            document.getElementById('day').value = session.day_of_week;
+            document.getElementById('mode').value = session.mode;
+            document.getElementById('sessionModal').style.display = 'flex';
+        }
+
+        async function handleSaveSession(e) {
+            e.preventDefault();
+            const id = document.getElementById('sessionId').value;
+            const data = {
+                session_title: document.getElementById('sessionTitle').value,
+                description: document.getElementById('sessionDesc').value,
+                start_time: document.getElementById('startTime').value,
+                end_time: document.getElementById('endTime').value,
+                day_of_week: document.getElementById('day').value,
+                mode: document.getElementById('mode').value
+            };
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+
+            try {
+                let url, method;
+                if (id) {
+                    url = `${CONFIG.API_BASE_URL}/workshops/sessions/${id}/`; // Uses new detail view
+                    method = 'PUT';
+                } else {
+                    url = `${CONFIG.API_BASE_URL}/workshops/${currentWorkshopId}/sessions/`;
+                    method = 'POST';
+                }
+
+                const res = await Auth.authenticatedFetch(url, {
+                    method: method,
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    closeModal();
+                    loadSessions(currentWorkshopId);
+                } else {
+                    const err = await res.json();
+                    alert("Error: " + JSON.stringify(err));
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Network Error");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function deleteSession(id) {
+            if (!confirm("Are you sure you want to delete this session?")) return;
+
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/sessions/${id}/`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) {
+                    loadSessions(currentWorkshopId);
+                } else {
+                    alert("Failed to delete");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - WMS Portal</title>
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/animations.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f172a 0%, #000000 100%);
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Back to Home -->
+    <a href="/index.html"
+        style="position: absolute; top: 24px; left: 24px; color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; transition: color 0.2s;"
+        onmouseover="this.style.color='white'" onmouseout="this.style.color='var(--text-muted)'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Home
+    </a>
+
+    <div class="auth-container">
+        <div class="card card-glass auth-card fade-in">
+            <div style="text-align: center; margin-bottom: 32px;">
+                <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 8px;">Welcome to WMS</h1>
+                <p style="color: var(--text-muted);">Log in to access your workshops</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" placeholder="you@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" placeholder="••••••••" required>
+                </div>
+
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 0.9rem;">
+                    <label
+                        style="display: flex; align-items: center; gap: 8px; color: var(--text-muted); cursor: pointer;">
+                        <input type="checkbox" style="accent-color: var(--primary);"> Remember me
+                    </label>
+                    <a href="#" style="color: var(--primary);">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Log In</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 24px; color: var(--text-muted); font-size: 0.9rem;">
+                New here? <a href="register.html" style="color: var(--teal); font-weight: 600;">Create an Account</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/auth.js"></script>
+    <script>
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+
+            const loginBtn = e.target.querySelector('button');
+            const originalText = loginBtn.innerText;
+            loginBtn.innerText = 'Signing In...';
+            loginBtn.disabled = true;
+
+            // We don't send role/type here, letting backend identify user
+            // Unless we want to force student? Let's just login generic.
+            const result = await Auth.login(email, password);
+
+            if (result.success) {
+                // Redirect based on role
+                const dashboard = Auth.getDashboardURL(result.role);
+                window.location.href = dashboard;
+            } else {
+                alert(result.error); // Simple alert as requested (User Req #8: show alert + stay)
+                loginBtn.innerText = originalText;
+                loginBtn.disabled = false;
+            }
+        }
+    </script>
+
+</body>
+
+</html>
