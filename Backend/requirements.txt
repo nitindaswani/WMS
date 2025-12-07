@@ -4,3 +4,7 @@ django-cors-headers
 Pillow
 reportlab
 qrcode
+psycopg2-binary
+dj-database-url
+gunicorn
+whitenoise
