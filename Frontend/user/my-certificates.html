@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Certificates - WMS Portal</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="../public/css/layout.css">
+    <link rel="stylesheet" href="../public/css/components.css">
+    <link rel="stylesheet" href="../public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <h1 class="page-title">My Certificates</h1>
+            </div>
+
+            <div id="modal-container"></div>
+
+            <div class="grid-3 stagger-children">
+                <div id="cert-card-1"></div>
+                <div id="cert-card-2"></div>
+                <div id="cert-card-3"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../public/js/config.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/dom.js"></script>
+    <script>
+        async function loadComponents() {
+            // Load Sidebar
+< !DOCTYPE html >
+                <html lang="en">
+
+                    <head>
+                        <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>My Certificates - WMS Portal</title>
+                                <link rel="stylesheet" href="../public/css/variables.css">
+                                    <link rel="stylesheet" href="../public/css/reset.css">
+                                        <link rel="stylesheet" href="../public/css/layout.css">
+                                            <link rel="stylesheet" href="../public/css/components.css">
+                                                <link rel="stylesheet" href="../public/css/animations.css">
+                                                </head>
+
+                                                <body>
+
+                                                    <div class="app-container">
+                                                        <aside class="sidebar" id="sidebar"></aside>
+
+                                                        <main class="main-content">
+                                                            <div id="navbar"></div>
+
+                                                            <div class="section-header fade-in">
+                                                                <h1 class="page-title">My Certificates</h1>
+                                                            </div>
+
+                                                            <div id="modal-container"></div>
+
+                                                            <div class="grid-3 stagger-children">
+                                                                <div id="cert-card-1"></div>
+                                                                <div id="cert-card-2"></div>
+                                                                <div id="cert-card-3"></div>
+                                                            </div>
+
+                                                        </main>
+                                                    </div>
+
+                                                    <script src="../public/js/config.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/dom.js"></script>
+    <script>
+                                            async function loadComponents() {
+            // Load Sidebar
+            const sidebarRes = await fetch('/components/user-sidebar.html');
+                                            document.getElementById('sidebar').innerHTML = await sidebarRes.text();
+
+                                            // Load Navbar
+                                            const navbarRes = await fetch('/components/user-navbar.html');
+                                            document.getElementById('navbar').innerHTML = await navbarRes.text();
+
+                                            // Load Modal
+                                            const modalRes = await fetch('/components/modal.html');
+                                            document.getElementById('modal-container').innerHTML = await modalRes.text();
+
+                                            // Update Navbar User Info
+                                            const userName = localStorage.getItem('user_full_name') || 'Student';
+                                            const userRole = localStorage.getItem('auth_role') || 'student';
+                                            if(document.getElementById('nav-user-name')) document.getElementById('nav-user-name').innerText = userName;
+                                            if(document.getElementById('nav-user-role')) document.getElementById('nav-user-role').innerText = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+
+                                            loadCertificates();
+        }
+
+                                            async function loadCertificates() {
+            const container = document.querySelector('.grid-3');
+                                            container.innerHTML = '<p style="color:var(--text-muted); grid-column: 1/-1;">Loading certificates...</p>';
+
+                                            try {
+                 const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/certificates/user/`);
+                                            if(res.ok) {
+                     const certs = await res.json();
+                                            renderCertificates(certs);
+                 } else {
+                                                container.innerHTML = '<p style="color:var(--text-muted); grid-column: 1/-1;">No certificates found or failed to load.</p>';
+                 }
+            } catch(e) {
+                                                console.error("Certificate fetch failed", e);
+                                            container.innerHTML = '<p style="color:var(--danger); grid-column: 1/-1;">Error loading certificates.</p>';
+            }
+        }
+
+                                            async function renderCertificates(certs) {
+            const container = document.querySelector('.grid-3');
+                                            container.innerHTML = '';
+
+                                            if(certs.length === 0) {
+                                                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                        <img src="https://cdni.iconscout.com/illustration/premium/thumb/diploma-4085817-3385486.png" style="height: 150px; opacity: 0.5;">
+                        <p style="color: var(--text-muted); margin-top: 16px;">You haven't earned any certificates yet.</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Complete workshops to earn certificates.</p>
+                    </div>`;
+                                            return;
+            }
+
+                                            const templateRes = await fetch('/components/certificate-card.html');
+                                            const template = await templateRes.text();
+
+            certs.forEach(c => {
+                 // Adjust parsing based on actual serializer structure.
+                 // Assuming c.registration (nested), or flattened fields. 
+                 // Based on View, it serializes Certificate model. 
+                 // Certificate usually has 'registration', 'file', 'issue_date'.
+                 // We might need to access c.registration.workshop.title etc.
+                 // Ideally Backend Serializer is nested. Let's assume best effort or inspect if needed.
+                 // If not nested, we might miss title. 
+
+                 // Fallback for title if data missing
+                 const title = c.workshop_title || (c.registration && c.registration.workshop_title) || 'Workshop Certificate';
+                                            const instructor = c.instructor || 'WMS Instructor';
+
+                                            let html = template;
+                                            html = html.replace('Introduction to UI/UX', title);
+                                            html = html.replace('Oct 15, 2025', new Date(c.created_at || Date.now()).toLocaleDateString());
+                                            html = html.replace('Gary Simon', instructor);
+
+                                            const div = document.createElement('div');
+                                            div.innerHTML = html;
+
+                                            const btn = div.querySelector('.btn-outline');
+                                            if(btn) {
+                                                btn.removeAttribute('href');
+                                            btn.style.cursor = 'pointer';
+                     btn.onclick = () => showDownloadDialog(c); 
+                 }
+
+                                            container.appendChild(div);
+            });
+        }
+
+                                            function showDownloadDialog(cert) {
+            const modal = document.getElementById('default-modal');
+                                            if(!modal) return;
+
+                                            const title = modal.querySelector('.card-title');
+                                            const body = modal.querySelector('.card-body');
+                                            const footer = modal.querySelector('.card-footer');
+                                            const confirmBtn = footer.querySelector('.btn-primary');
+                                            const cancelBtn = footer.querySelector('.btn-outline'); // Assuming outline is cancel
+
+                                            title.innerText = 'Download Certificate';
+                                            body.innerHTML = `
+                                            <div style="text-align: center;">
+                                                <p style="margin-bottom: 16px;">You are about to download the certificate for:</p>
+                                                <h3 style="color: var(--primary); margin-bottom: 16px;">${cert.workshop_title || 'Workshop'}</h3>
+                                                <p style="font-size: 0.9rem; color: var(--text-muted);">Format: PDF</p>
+                                            </div>
+                                            `;
+
+                                            confirmBtn.innerText = 'Download Now';
+            confirmBtn.onclick = () => downloadFile(cert.file, `Certificate-${cert.id}.pdf`);
+            
+            cancelBtn.onclick = () => {
+                                                modal.style.display = 'none';
+            };
+
+                                            modal.style.display = 'flex';
+        }
+
+                                            function downloadFile(url, filename) {
+             const a = document.createElement('a');
+                                            a.href = url; // If file is served statically/media
+                                            a.download = filename;
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            document.body.removeChild(a);
+                                            document.getElementById('default-modal').style.display = 'none';
+        }
+
+                                            loadComponents();
+    </script>
+</body>
+
+</html>

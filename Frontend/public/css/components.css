@@ -1,0 +1,199 @@
+/* Components Styling */
+
+/* Cards (Glassmorphism) */
+.card {
+    background: #111726;
+    /* Fixed theme color */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    /* Softer border */
+    border-radius: var(--radius-lg);
+    padding: var(--card-padding);
+    position: relative;
+    overflow: hidden;
+    /* Soft shadow as requested */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.card-glass {
+    background: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--btn-height);
+    padding: 0 24px;
+    border-radius: 12px;
+    /* 10-14px range */
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all var(--transition-fast);
+    gap: 8px;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), #2962FF);
+    color: white;
+    box-shadow: 0 4px 14px var(--primary-glow);
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px var(--primary-glow);
+}
+
+.btn-accent {
+    background: linear-gradient(135deg, var(--accent), #7B1FA2);
+    color: white;
+    box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-main);
+}
+
+.btn-outline:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(58, 123, 255, 0.05);
+}
+
+/* Inputs */
+.form-group {
+    margin-bottom: 24px;
+    /* Increased spacing */
+    text-align: left;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    height: var(--input-height);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0 16px;
+    color: var(--text-highlight);
+    font-size: 1rem;
+    transition: var(--transition-fast);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(58, 123, 255, 0.05);
+    box-shadow: 0 0 0 2px rgba(58, 123, 255, 0.2);
+}
+
+select.form-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+    background-color: rgba(255, 255, 255, 0.05); /* Match other inputs */
+    padding-right: 2.5rem;
+}
+
+select.form-input option {
+    background-color: #1a1f2e; /* Dark theme bg */
+    color: white;
+    padding: 10px;
+}
+
+/* Tables */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.table th {
+    padding: 16px;
+    color: var(--text-muted);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table td {
+    padding: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: var(--text-main);
+}
+
+.table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Badges */
+.badge {
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-success {
+    background: rgba(0, 230, 118, 0.15);
+    color: var(--success);
+}
+
+.badge-warning {
+    background: rgba(255, 193, 7, 0.15);
+    color: var(--warning);
+}
+
+.badge-danger {
+    background: rgba(255, 61, 0, 0.15);
+    color: var(--danger);
+}
+
+.badge-primary {
+    background: rgba(58, 123, 255, 0.15);
+    color: var(--primary);
+}
+
+/* Icons */
+.icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}

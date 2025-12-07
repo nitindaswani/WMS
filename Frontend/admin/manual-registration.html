@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Registration - WMS Admin</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="../public/css/layout.css">
+    <link rel="stylesheet" href="../public/css/components.css">
+    <link rel="stylesheet" href="../public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <div>
+                    <h1 class="page-title">Manual Registration</h1>
+                    <p class="page-subtitle">Register users to workshops manually.</p>
+                </div>
+            </div>
+
+            <div class="card fade-in" style="max-width: 600px;">
+                <form id="manualRegForm" onsubmit="handleRegister(event)">
+
+                    <div class="form-group">
+                        <label class="form-label">Select Workshop</label>
+                        <select id="workshopSelect" class="form-input" required>
+                            <option value="">Loading workshops...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Search User</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="userSearch" class="form-input" placeholder="Name or Email"
+                                oninput="searchUsers(this.value)">
+                        </div>
+                        <div id="userResults"
+                            style="margin-top: 8px; border: 1px solid var(--border-color); border-radius: 8px; max-height: 200px; overflow-y: auto; display: none;">
+                            <!-- Results here -->
+                        </div>
+                        <input type="hidden" id="selectedUserId" required>
+                        <div id="selectedUserDisplay"
+                            style="margin-top: 8px; font-weight: 600; color: var(--primary); display: none;">
+                            Selected: <span id="selectedUserName"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select id="roleSelect" class="form-input">
+                            <option value="student">Student</option>
+                            <option value="speaker">Speaker</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Register
+                        User</button>
+                    <div id="msg" style="margin-top: 16px; text-align: center;"></div>
+                </form>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../public/js/config.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/dom.js"></script>
+    <script>
+        if (!Auth.isAuthenticated()) window.location.href = '/user/login.html';
+
+        // Load Workshops
+        async function loadWorkshops() {
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/`);
+                if (res.ok) {
+                    const workshops = await res.json();
+                    const select = document.getElementById('workshopSelect');
+                    select.innerHTML = '<option value="">Select a Workshop...</option>';
+                    workshops.forEach(w => {
+                        const opt = document.createElement('option');
+                        opt.value = w.id;
+                        opt.textContent = w.title;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        loadWorkshops();
+
+        // Search Users
+        let debounceTimer;
+        async function searchUsers(query) {
+            clearTimeout(debounceTimer);
+            if (query.length < 2) {
+                document.getElementById('userResults').style.display = 'none';
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/auth/users/?search=${query}`);
+                    if (res.ok) {
+                        const users = await res.json();
+                        const resultsDiv = document.getElementById('userResults');
+                        resultsDiv.innerHTML = '';
+                        resultsDiv.style.display = 'block';
+
+                        if (users.length === 0) {
+                            resultsDiv.innerHTML = '<div style="padding: 8px; color: var(--text-muted);">No users found</div>';
+                            return;
+                        }
+
+                        users.forEach(u => {
+                            const div = document.createElement('div');
+                            div.style.padding = '8px';
+                            div.style.cursor = 'pointer';
+                            div.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                            div.onmouseover = () => div.style.background = 'rgba(255,255,255,0.05)';
+                            div.onmouseout = () => div.style.background = 'transparent';
+                            div.innerHTML = `<div>${u.full_name || 'No Name'}</div><div style="font-size:0.8rem; color:var(--text-muted);">${u.email}</div>`;
+                            div.onclick = () => selectUser(u);
+                            resultsDiv.appendChild(div);
+                        });
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }, 300);
+        }
+
+        function selectUser(user) {
+            document.getElementById('selectedUserId').value = user.id;
+            document.getElementById('selectedUserName').textContent = `${user.full_name} (${user.email})`;
+            document.getElementById('selectedUserDisplay').style.display = 'block';
+            document.getElementById('userResults').style.display = 'none';
+            document.getElementById('userSearch').value = '';
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const workshopId = document.getElementById('workshopSelect').value;
+            const userId = document.getElementById('selectedUserId').value;
+            const role = document.getElementById('roleSelect').value;
+
+            if (!workshopId || !userId) {
+                alert('Please select workshop and user');
+                return;
+            }
+
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Registering...';
+
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/admin/register/`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        workshop_id: workshopId,
+                        user_id: userId,
+                        role: role
+                    })
+                });
+
+                const data = await res.json();
+                const msg = document.getElementById('msg');
+
+                if (res.ok) {
+                    msg.innerHTML = `<span style="color: var(--success);">${data.message}</span>`;
+                    // Reset form partially
+                    document.getElementById('selectedUserId').value = '';
+                    document.getElementById('selectedUserDisplay').style.display = 'none';
+                } else {
+                    msg.innerHTML = `<span style="color: var(--danger);">${data.error || 'Failed'}</span>`;
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('msg').innerHTML = `<span style="color: var(--danger);">Error occurred</span>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        }
+    </script>
+
+</body>
+
+</html>

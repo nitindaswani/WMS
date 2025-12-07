@@ -1,0 +1,80 @@
+/* Animations */
+
+/* Fade In */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn var(--transition-normal) forwards;
+}
+
+/* Slide In from Left */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in-left {
+    animation: slideInLeft var(--transition-normal) forwards;
+}
+
+/* Pulse Glow (for active states or alerts) */
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 var(--primary-glow);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(58, 123, 255, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(58, 123, 255, 0);
+    }
+}
+
+.pulse-glow {
+    animation: pulseGlow 2s infinite;
+}
+
+/* Shimmer Effect (Loading) */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.loading-shimmer {
+    background: linear-gradient(90deg, var(--bg-card), var(--border-color), var(--bg-card));
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+}
+
+/* Float Hover */
+.float-hover {
+    transition: transform 0.3s var(--ease-out);
+}
+
+.float-hover:hover {
+    transform: translateY(-5px);
+}

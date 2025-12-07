@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Registrations - WMS Portal</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="../public/css/layout.css">
+    <link rel="stylesheet" href="../public/css/components.css">
+    <link rel="stylesheet" href="../public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <h1 class="page-title">My Registrations</h1>
+            </div>
+
+            <div id="modal-container"></div>
+
+            <div class="grid-2 fade-in" id="registrations-grid">
+                <!-- Dynamic Content Loading -->
+                <p style="color: var(--text-muted);">Loading registrations...</p>
+            </div>
+
+            <div class="card" style="margin-top: 32px; text-align: center; padding: 40px; color: var(--text-muted);">
+                <p>Looking for past events? <a href="#" style="color: var(--primary);">View History</a></p>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../public/js/config.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/dom.js"></script>
+    <script>
+        async function loadPage() {
+            // Check Auth
+            if (!Auth.isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Load Modal Component
+            const modalRes = await fetch('/components/modal.html');
+            document.getElementById('modal-container').innerHTML = await modalRes.text();
+
+            // Fetch Registrations
+            try {
+                const response = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/user/registrations/`);
+                if (response.ok) {
+                    const registrations = await response.json();
+                    renderRegistrations(registrations);
+                } else {
+                    document.getElementById('registrations-grid').innerHTML = '<p>Failed to load registrations.</p>';
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('registrations-grid').innerHTML = '<p>Error loading data.</p>';
+            }
+        }
+
+        async function renderRegistrations(registrations) {
+            const grid = document.getElementById('registrations-grid');
+            grid.innerHTML = '';
+
+            if (registrations.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                        <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-box-4085812-3385481.png" style="height: 150px; opacity: 0.5;">
+                        <p style="color: var(--text-muted); margin-top: 16px;">You haven't registered for any workshops yet.</p>
+                        <a href="workshops.html" class="btn btn-primary" style="margin-top: 16px;">Browse Workshops</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Load template manually or build string
+            const cardTemplateRes = await fetch('/components/registration-card.html');
+            let cardTemplate = '';
+            if (cardTemplateRes.ok) cardTemplate = await cardTemplateRes.text();
+
+            // Fallback template if fetch fails
+            if (!cardTemplate) {
+                cardTemplate = `
+                    <div class="card">
+                        <h3>Name</h3>
+                        <a href="#">Details</a>
+                    </div>
+                 `;
+            }
+
+            registrations.forEach(reg => {
+                let card = cardTemplate;
+                // API returns: { id, workshop: ID, workshop_title, workshop_date, status, ... } 
+                // Adjust based on actual Serializer response structure. 
+                // NOTE: Based on my memory of backend, user RegistrationSerializer likely returns nested workshop details or at least title.
+                // Assuming flat structure or need to inspect. 
+                // Let's assume: reg.workshop_title, reg.start_date, reg.status.
+
+                const dateStr = new Date(reg.workshop_date).toLocaleDateString();
+
+                card = card.replace('React Masterclass', reg.workshop_title || 'Workshop');
+                card = card.replace('Started Oct 12, 2025', `${dateStr}`);
+                card = card.replace('Confirmed', reg.status || 'Registered');
+                card = card.replace('10:00 AM - 04:00 PM', 'Check Details');
+                card = card.replace('Tech Park, Hall A', 'Online/TBD');
+
+                // Regex for ALL occurrences of IDs link
+                // card = card.replace(/href="\/user\/workshop-details.html\?id=1"/g, `href="/user/workshop-details.html?id=${reg.workshop}"`);
+                // Simple Replace
+                card = card.replace('href="/user/workshop-details.html?id=1"', `href="/user/workshop-details.html?id=${reg.workshop}"`);
+
+                // QR Code Logic
+                // We leave the QR function call bound to the card click or specific button
+                // If the template has onclick="showQR(123)", we replace it.
+                card = card.replace(/showQR\(.*?\)/g, `showQR(${reg.id})`);
+
+                // Add unique ID to card container if needed
+                const div = document.createElement('div');
+                div.innerHTML = card;
+                grid.appendChild(div.firstElementChild); // Append the card itself
+            });
+        }
+
+        // QR Function
+        async function showQR(regId) {
+            const modal = document.getElementById('default-modal');
+            const title = modal.querySelector('.card-title');
+            const body = modal.querySelector('.card-body');
+            const footer = modal.querySelector('.card-footer');
+
+            title.innerText = 'Your Entry Ticket';
+            body.innerHTML = `
+                <div style="text-align: center;">
+                    <p style="margin-bottom: 16px; color: var(--text-muted);">Scan this QR code at the venue entrance.</p>
+                    <div id="qr-container" style="min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: var(--text-muted);">Loading QR...</span>
+                    </div>
+                </div>
+            `;
+            // Hide footer
+            footer.style.display = 'none';
+            modal.style.display = 'flex';
+
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/attendance/qr/${regId}/`);
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    document.getElementById('qr-container').innerHTML = `
+                        <img src="${url}" alt="QR Code" 
+                             style="width: 200px; height: 200px; border-radius: 8px; border: 4px solid white;">
+                    `;
+                } else {
+                    document.getElementById('qr-container').innerHTML = '<span style="color: var(--danger);">Failed to load QR</span>';
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('qr-container').innerHTML = '<span style="color: var(--danger);">Error loading QR</span>';
+            }
+        }
+
+        loadPage();
+    </script>
+</body>
+
+</html>

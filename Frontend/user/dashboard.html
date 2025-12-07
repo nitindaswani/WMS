@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WMS Portal</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="../public/css/layout.css">
+    <link rel="stylesheet" href="../public/css/components.css">
+    <link rel="stylesheet" href="../public/css/animations.css">
+    <style>
+        .banner {
+            background: linear-gradient(90deg, #3A7BFF 0%, #9D4BFF 100%);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            color: white;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <!-- Navbar -->
+            <div id="navbar"></div>
+
+            <!-- Welcome Banner -->
+            <div class="banner fade-in">
+                <div>
+                    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 8px;">Welcome back, <span
+                            id="user-welcome-name">Student</span>!</h1>
+                    <p style="opacity: 0.9;">You have 2 upcoming workshops this week.</p>
+                </div>
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/coding-3462274-2895956.png"
+                    alt="Learning" style="height: 120px; display: none; @media(min-width: 768px){display: block;}">
+            </div>
+
+            <!-- Quick Stats -->
+            <section class="grid-3 stagger-children">
+                <div class="card stat-card float-hover">
+                    <div class="stat-value" id="stat-attended">-</div>
+                    <div class="stat-label">Workshops Attended</div>
+                </div>
+                <div class="card stat-card float-hover">
+                    <div class="stat-value" id="stat-certificates">-</div>
+                    <div class="stat-label">Certificates Earned</div>
+                </div>
+                <div class="card stat-card float-hover">
+                    <div class="stat-value">12h</div>
+                    <div class="stat-label">Learning Time</div>
+                </div>
+            </section>
+
+            <!-- Upcoming Registrations -->
+            <section class="fade-in" style="margin-top: 32px; animation-delay: 0.3s;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 style="font-size: 1.25rem; font-weight: 600;">Upcoming Workshops</h2>
+                    <a href="my-registrations.html" style="color: var(--primary);">View All</a>
+                </div>
+
+                <div class="grid-2" id="upcoming-grid">
+                    <div style="color:var(--text-muted);">Loading...</div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="../public/js/config.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/dom.js"></script>
+    <script>
+        async function loadComponents() {
+            // Load Sidebar
+            const sidebarRes = await fetch('/components/user-sidebar.html');
+            document.getElementById('sidebar').innerHTML = await sidebarRes.text();
+
+            // Load Navbar
+            const navbarRes = await fetch('/components/user-navbar.html');
+            document.getElementById('navbar').innerHTML = await navbarRes.text();
+
+            // Set User Name (Banner & Navbar)
+            const userName = localStorage.getItem('user_full_name') || 'Student';
+            document.getElementById('user-welcome-name').innerText = userName;
+            if (document.getElementById('nav-user-name')) document.getElementById('nav-user-name').innerText = userName;
+
+            loadDashboard();
+        }
+
+        async function loadDashboard() {
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/analytics/`);
+                if (res.ok) {
+                    const data = await res.json();
+
+                    // Update Stats
+                    document.getElementById('stat-attended').innerText = data.total_registrations || 0;
+                    document.getElementById('stat-certificates').innerText = data.certificates || 0;
+
+                    // Update Upcoming Container
+                    const upcomingContainer = document.getElementById('upcoming-grid');
+                    upcomingContainer.innerHTML = '';
+
+                    if (data.upcoming_workshops && data.upcoming_workshops.length > 0) {
+                        data.upcoming_workshops.forEach(w => {
+                            const date = new Date(w.start_date);
+                            const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                            const div = document.createElement('div');
+                            div.className = 'card float-hover';
+                            div.onclick = () => window.location.href = `workshop-details.html?id=${w.id}`;
+                            div.style.cursor = 'pointer';
+                            div.innerHTML = `
+                                <div style="display:flex;justify-content:space-between; align-items: flex-start;">
+                                    <div>
+                                        <h3 style="font-weight:600; font-size: 1.1rem; color: var(--text-highlight);">${w.title}</h3>
+                                        <p style="color:var(--text-muted);font-size:0.9rem;margin-top:4px;">${formattedDate}</p>
+                                    </div>
+                                    <span class="badge badge-success">Registered</span>
+                                </div>
+                                <div style="margin-top: 16px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted);">
+                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                     ${w.location || 'Online'}
+                                </div>
+                            `;
+                            upcomingContainer.appendChild(div);
+                        });
+
+                        // Update Banner Header Text count
+                        const bannerText = document.querySelector('.banner p');
+                        if (bannerText) bannerText.innerText = `You have ${data.upcoming_workshops.length} upcoming workshops.`;
+
+                    } else {
+                        upcomingContainer.innerHTML = `
+                            <div style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-muted);">
+                                No upcoming workshops found. 
+                                <br><br>
+                                <a href="workshops.html" class="btn btn-primary">Browse Workshops</a>
+                            </div>`;
+
+                        const bannerText = document.querySelector('.banner p');
+                        if (bannerText) bannerText.innerText = `You have no upcoming workshops.`;
+                    }
+
+                } else {
+                    console.error("Failed to load dashboard data");
+                }
+            } catch (e) {
+                console.error("Dashboard Load Error:", e);
+            }
+        }
+
+        loadComponents();
+    </script>
+</body>
+
+</html>

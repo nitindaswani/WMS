@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speaker Profile - WMS Portal</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="../public/css/layout.css">
+    <link rel="stylesheet" href="../public/css/components.css">
+    <link rel="stylesheet" href="../public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <h1 class="page-title">Speaker Profile</h1>
+            </div>
+
+            <div class="grid-2 fade-in">
+                <!-- Preview Card -->
+                <div>
+                    <h3 class="card-title" style="margin-bottom: 16px;">Public Preview</h3>
+                    <div id="speaker-card-preview"></div>
+                </div>
+
+                <!-- Edit Form -->
+                <div class="card">
+                    <h3 class="card-title">Edit Profile</h3>
+                    <form>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" value="Guest Speaker Name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Professional Title</label>
+                            <input type="text" class="form-input" value="Senior Developer @ TechCorp">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-input"
+                                rows="4">Expert in scalable systems and cloud architecture. Love teaching and mentoring upcoming developers.</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">LinkedIn URL</label>
+                            <input type="url" class="form-input" placeholder="https://linkedin.com/in/...">
+                        </div>
+                        <button class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        async function loadComponents() {
+            const sidebarRes = await fetch('/components/user-sidebar.html');
+            document.getElementById('sidebar').innerHTML = await sidebarRes.text();
+
+            const navbarRes = await fetch('/components/user-navbar.html');
+            document.getElementById('navbar').innerHTML = await navbarRes.text();
+
+            const cardRes = await fetch('/components/speaker-card.html');
+            document.getElementById('speaker-card-preview').innerHTML = await cardRes.text();
+
+            // Simulate Speaker Role for Sidebar
+            setTimeout(() => {
+                document.getElementById('speaker-menu').style.display = 'block';
+            }, 100);
+        }
+        loadComponents();
+    </script>
+</body>
+
+</html>

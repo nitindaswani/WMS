@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WMS Speaker</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="../public/css/layout.css">
+    <link rel="stylesheet" href="../public/css/components.css">
+    <link rel="stylesheet" href="../public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <h1 class="page-title">Speaker Dashboard</h1>
+                <p class="page-subtitle">Welcome back, Dr. Angela Yu</p>
+            </div>
+
+            <section class="grid-3 stagger-children">
+                <div class="card stat-card float-hover">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Assigned Workshops</div>
+                </div>
+                <div class="card stat-card float-hover">
+                    <div class="stat-value">124</div>
+                    <div class="stat-label">Total Attendees Reach</div>
+                </div>
+                <div class="card stat-card float-hover">
+                    <div class="stat-value">4.9</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+            </section>
+
+            <section style="margin-top: 32px;" class="fade-in">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 16px;">Upcoming Sessions</h2>
+
+                <div class="card" style="margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <h4 style="font-size: 1.1rem; font-weight: 600;">System Design Patterns</h4>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Nov 12 • 10:00 AM - 12:00 PM</p>
+                        </div>
+                        <a href="live-sessions.html" class="btn btn-outline">Prepare Session</a>
+                    </div>
+                </div>
+            </section>
+
+            <section style="margin-top: 32px;" class="fade-in">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 16px;">Quick Actions</h2>
+                <div class="grid-2">
+                    <div class="card" style="text-align: center; cursor: pointer;">
+                        <svg class="icon" style="width: 32px; height: 32px; color: var(--accent); margin-bottom: 12px;"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <h4 style="font-weight: 600;">Upload Materials</h4>
+                    </div>
+                    <div class="card" style="text-align: center; cursor: pointer;">
+                        <svg class="icon" style="width: 32px; height: 32px; color: var(--teal); margin-bottom: 12px;"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <h4 style="font-weight: 600;">Update Profile</h4>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="../public/js/config.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/dom.js"></script>
+    <script>
+        if (!Auth.isAuthenticated() || Auth.getRole() !== 'speaker') window.location.href = '/user/login.html';
+
+        async function init() {
+            // User Name
+            document.querySelector('.page-subtitle').innerText = `Welcome back, ${localStorage.getItem('user_full_name')}`;
+
+            // Load Analytics
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/analytics/`);
+                if (res.ok) {
+                    const data = await res.json();
+                    // Update Stats
+                    const stats = document.querySelectorAll('.stat-value');
+                    stats[0].innerText = data.total_workshops || 0;
+                    stats[1].innerText = data.total_sessions || 0;
+                    stats[2].innerText = '4.9'; // Placeholder rating
+
+                    // Update Upcoming Section
+                    const upcomingContainer = document.querySelector('section[style="margin-top: 32px;"]');
+                    if (data.upcoming && data.upcoming.length > 0) {
+                        const listHtml = data.upcoming.map(w => `
+                            <div class="card" style="margin-bottom: 16px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <h4 style="font-size: 1.1rem; font-weight: 600;">${w.title}</h4>
+                                        <p style="color: var(--text-muted); font-size: 0.9rem;">${w.start_date || 'TBA'}</p>
+                                    </div>
+                                    <a href="/user/workshop-details.html?id=${w.id}" class="btn btn-outline">View Details</a>
+                                </div>
+                            </div>
+                        `).join('');
+                        upcomingContainer.innerHTML = '<h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 16px;">Upcoming Workshops</h2>' + listHtml;
+                    } else {
+                        upcomingContainer.innerHTML = '<p class="text-muted">No upcoming workshops assigned.</p>';
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        init();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS Pro - Workshop Management System</title>
+    <link rel="stylesheet" href="public/css/variables.css">
+    <link rel="stylesheet" href="public/css/reset.css">
+    <link rel="stylesheet" href="public/css/layout.css">
+    <link rel="stylesheet" href="public/css/components.css">
+    <link rel="stylesheet" href="public/css/animations.css">
+    <style>
+        .hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at top center, rgba(58, 123, 255, 0.15), transparent 60%);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 24px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 20px;
+            animation: fadeIn 0.8s ease-out 0.4s backwards;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero">
+        <h1 class="hero-title">Next-Gen Workshop Management</h1>
+        <p class="hero-subtitle">Streamline your events, manage attendees, and generate certificates with the most
+            advanced WMS dashboard.</p>
+
+        <div class="hero-actions">
+            <a href="/admin/login.html" class="btn btn-primary pulse-glow">Admin Login</a>
+            <a href="/user/login.html" class="btn btn-outline">User Login / Sign Up</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

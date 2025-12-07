@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Workshops - WMS Portal</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="../public/css/layout.css">
+    <link rel="stylesheet" href="../public/css/components.css">
+    <link rel="stylesheet" href="../public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <div>
+                    <h1 class="page-title">Browse Workshops</h1>
+                    <p class="page-subtitle">Discover new skills and events.</p>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <select class="form-input" style="width: 150px;">
+                        <option>All Categories</option>
+                        <option>Tech</option>
+                        <option>Design</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Workshop Grid -->
+            <div class="grid-3 stagger-children" id="workshop-grid">
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">
+                    Loading workshops...
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../public/js/config.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/dom.js"></script>
+    <script>
+        async function loadComponents() {
+            const sidebarRes = await fetch('/components/user-sidebar.html');
+            document.getElementById('sidebar').innerHTML = await sidebarRes.text();
+
+            const navbarRes = await fetch('/components/user-navbar.html');
+            document.getElementById('navbar').innerHTML = await navbarRes.text();
+
+            loadWorkshops();
+        }
+
+        async function loadWorkshops() {
+            const grid = document.getElementById('workshop-grid');
+            try {
+                // Students can view workshops publically or authenticated. Assuming Authenticated as per other pages.
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/`);
+                if (res.ok) {
+                    const workshops = await res.json();
+
+                    if (workshops.length === 0) {
+                        grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">No workshops available at the moment.</div>';
+                        return;
+                    }
+
+                    grid.innerHTML = '';
+                    workshops.forEach(w => {
+                        const bgGradient = getGradient(w.category);
+                        const card = document.createElement('div');
+                        card.className = 'card float-hover';
+                        card.style.display = 'flex';
+                        card.style.flexDirection = 'column';
+                        card.style.height = '100%';
+
+                        card.innerHTML = `
+                             <div style="height: 140px; background: ${bgGradient}; border-radius: var(--radius-md); margin-bottom: 16px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.5rem;">
+                                ${w.category || 'Workshop'}
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;">${w.title}</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; flex-grow: 1;">
+                                ${w.description ? w.description.substring(0, 80) + '...' : 'No description'}
+                            </p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <span class="badge badge-primary">${w.start_date}</span>
+                                <span style="font-weight: 600; color: var(--teal);">$${w.budget}</span>
+                            </div>
+                            <a href="workshop-details.html?id=${w.id}" class="btn btn-outline" style="width: 100%;">View Details</a>
+                        `;
+                        grid.appendChild(card);
+                    });
+                } else {
+                    grid.innerHTML = '<p style="color:red; text-align:center; grid-column:1/-1;">Failed to load workshops</p>';
+                }
+            } catch (e) {
+                console.error(e);
+                grid.innerHTML = '<p style="color:red; text-align:center; grid-column:1/-1;">Error loading data</p>';
+            }
+        }
+
+        function getGradient(category) {
+            // Simple helper for visual variety
+            if (!category) return 'linear-gradient(135deg, #6b7280, #9ca3af)';
+            const c = category.toLowerCase();
+            if (c.includes('tech') || c.includes('react') || c.includes('node')) return 'linear-gradient(135deg, #1e3a8a, #3b82f6)';
+            if (c.includes('design') || c.includes('figma')) return 'linear-gradient(135deg, #581c87, #a855f7)';
+            if (c.includes('business')) return 'linear-gradient(135deg, #064e3b, #10b981)';
+            return 'linear-gradient(135deg, #374151, #4b5563)';
+        }
+
+        loadComponents();
+    </script>
+</body>
+
+</html>

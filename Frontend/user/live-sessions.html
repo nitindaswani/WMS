@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Sessions - WMS Speaker</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="../public/css/layout.css">
+    <link rel="stylesheet" href="../public/css/components.css">
+    <link rel="stylesheet" href="../public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <h1 class="page-title">Live Sessions</h1>
+                <p class="page-subtitle">Manage your active workshops.</p>
+            </div>
+
+            <div class="card fade-in" style="border: 2px solid var(--accent);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                    <span class="badge badge-danger" style="animation: pulse-red 2s infinite;">Live Now</span>
+                    <div style="color: var(--text-muted);">Started 15 mins ago</div>
+                </div>
+
+                <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 8px;">System Design Patterns</h2>
+                <p style="color: var(--text-muted); margin-bottom: 32px;">Main Hall A • 45 Attendees Checked In</p>
+
+                <div class="grid-3">
+                    <button class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        Start Presentation
+                    </button>
+                    <button class="btn btn-outline">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5"></path>
+                        </svg>
+                        Share Resources
+                    </button>
+                    <button class="btn btn-outline" style="color: var(--danger); border-color: var(--danger);">
+                        End Session
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        async function loadComponents() {
+            const sidebarRes = await fetch('/components/sidebar-speaker.html');
+            document.getElementById('sidebar').innerHTML = await sidebarRes.text();
+
+            const navbarRes = await fetch('/components/user-navbar.html');
+            document.getElementById('navbar').innerHTML = await navbarRes.text();
+        }
+        loadComponents();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - WMS</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="../public/css/layout.css">
+    <link rel="stylesheet" href="../public/css/components.css">
+    <link rel="stylesheet" href="../public/css/animations.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <h1 class="page-title">My Profile</h1>
+            </div>
+
+            <div class="card fade-in" style="max-width: 600px;">
+                <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 32px;">
+                    <div
+                        style="width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;">
+                        <span id="avatar-initials">U</span>
+                    </div>
+                    <div>
+                        <h2 id="profile-name" style="font-size: 1.5rem; font-weight: 700;">User Name</h2>
+                        <span id="profile-role" class="badge badge-primary">Student</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="text" id="profile-email" class="form-input" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <input type="text" id="profile-role-display" class="form-input" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Member Since</label>
+                    <input type="text" id="profile-joined" class="form-input" readonly>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../public/js/config.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/dom.js"></script>
+    <script>
+        if (!Auth.isAuthenticated()) window.location.href = 'login.html';
+
+        async function init() {
+            // Load components
+            const sidebarRes = await fetch('/components/user-sidebar.html');
+            document.getElementById('sidebar').innerHTML = await sidebarRes.text();
+
+            const navbarRes = await fetch('/components/user-navbar.html');
+            document.getElementById('navbar').innerHTML = await navbarRes.text();
+
+            // Load User Data
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/auth/user/`);
+                if (res.ok) {
+                    const user = await res.json();
+
+                    document.getElementById('profile-name').innerText = user.full_name || 'User';
+                    document.getElementById('avatar-initials').innerText = (user.full_name || 'U').charAt(0).toUpperCase();
+                    document.getElementById('profile-role').innerText = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+
+                    document.getElementById('profile-email').value = user.email;
+                    document.getElementById('profile-role-display').value = user.role.toUpperCase();
+                    // Joined date not in serializer? assuming 'date_joined' from django User model if serialized.
+                    // If not available, placeholder. 
+                    if (user.date_joined) {
+                        document.getElementById('profile-joined').value = new Date(user.date_joined).toLocaleDateString();
+                    } else {
+                        document.getElementById('profile-joined').value = "Unknown";
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        init();
+    </script>
+</body>
+
+</html>

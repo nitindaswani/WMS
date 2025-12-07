@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attended Workshops - WMS Student</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="../public/css/layout.css">
+    <link rel="stylesheet" href="../public/css/components.css">
+    <link rel="stylesheet" href="../public/css/animations.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="navbar"></div>
+
+            <div class="section-header fade-in">
+                <h1 class="page-title">Attended Workshops</h1>
+                <p class="page-subtitle">Your learning history.</p>
+            </div>
+
+            <div class="card fade-in">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Workshop</th>
+                            <th>Date</th>
+                            <th>Instructor</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 500;">
+                                Intro to Python
+                            </td>
+                            <td>Sep 10, 2025</td>
+                            <td>Dr. Angela Yu</td>
+                            <td><span class="badge badge-success">Completed</span></td>
+                            <td>
+                                <a href="my-certificates.html" class="btn btn-outline"
+                                    style="padding: 4px 12px; height: 32px; font-size: 0.85rem;">Certificate</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">
+                                CSS Masterclass
+                            </td>
+                            <td>Aug 15, 2025</td>
+                            <td>Kevin Powell</td>
+                            <td><span class="badge badge-success">Completed</span></td>
+                            <td>
+                                <button class="btn btn-primary"
+                                    style="padding: 4px 12px; height: 32px; font-size: 0.85rem;">Submit
+                                    Feedback</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        async function loadComponents() {
+            const sidebarRes = await fetch('/components/sidebar-student.html');
+            document.getElementById('sidebar').innerHTML = await sidebarRes.text();
+
+            const navbarRes = await fetch('/components/user-navbar.html');
+            document.getElementById('navbar').innerHTML = await navbarRes.text();
+        }
+        loadComponents();
+    </script>
+</body>
+
+</html>
