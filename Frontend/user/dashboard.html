@@ -89,10 +89,33 @@
             const navbarRes = await fetch('/components/user-navbar.html');
             document.getElementById('navbar').innerHTML = await navbarRes.text();
 
-            // Set User Name (Banner & Navbar)
-            const userName = localStorage.getItem('user_full_name') || 'Student';
+            // Ensure User Name is available
+            let userName = localStorage.getItem('user_full_name');
+            if (!userName || userName === 'Student') {
+                 try {
+                    const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/auth/user/`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        userName = data.full_name || 'Student';
+                        localStorage.setItem('user_full_name', userName);
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch user profile:", e);
+                }
+            }
+
+            // Update UI
+            userName = userName || 'Student';
+            const initials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
             document.getElementById('user-welcome-name').innerText = userName;
-            if (document.getElementById('nav-user-name')) document.getElementById('nav-user-name').innerText = userName;
+            
+            if (document.getElementById('nav-user-name')) {
+                document.getElementById('nav-user-name').innerText = userName;
+                // Update Avatar Initials
+                const avatar = document.querySelector('.user-avatar');
+                if (avatar) avatar.innerText = initials;
+            }
 
             loadDashboard();
         }

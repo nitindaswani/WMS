@@ -215,7 +215,7 @@
 
                 div.onmouseover = () => div.style.background = 'rgba(255,255,255,0.05)';
                 div.onmouseout = () => div.style.background = 'rgba(255,255,255,0.02)';
-                div.onclick = () => window.location.href = `workshop-details.html?id=${item.id}`; // Assuming detail page exists or list
+                div.onclick = () => window.location.href = `create-workshop.html?id=${item.id}`;
 
                 div.innerHTML = `
                    <div style="width: 48px; height: 48px; background: rgba(58, 123, 255, 0.15); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--primary); font-weight: 700; flex-shrink:0;">
@@ -230,6 +230,8 @@
                 container.appendChild(div);
             });
         }
-</body >
+        loadDashboard();
+    </script>
+</body>
 
-</html >
+</html>

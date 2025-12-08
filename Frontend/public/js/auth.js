@@ -4,10 +4,13 @@
  */
 
 const Auth = {
-    // Store token and role
-    setSession: (token, role) => {
+    // Store token, role, and name
+    setSession: (token, role, fullName) => {
         localStorage.setItem('auth_token', token);
         localStorage.setItem('auth_role', role);
+        if (fullName) {
+            localStorage.setItem('user_full_name', fullName);
+        }
     },
 
     // Get token
@@ -24,6 +27,7 @@ const Auth = {
     clearSession: () => {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_role');
+        localStorage.removeItem('user_full_name');
     },
 
     // Check if user is logged in
@@ -56,8 +60,7 @@ const Auth = {
             // Expecting: { token: '...', user_id: 1, email: '...', role: 'student' }
             if (data.token) {
                 const userRole = data.role || 'student';
-                Auth.setSession(data.token, userRole);
-                if (data.full_name) localStorage.setItem('user_full_name', data.full_name);
+                Auth.setSession(data.token, userRole, data.full_name);
                 return { success: true, role: userRole };
             } else {
                 return { success: false, error: 'No token received from server' };
@@ -93,7 +96,8 @@ const Auth = {
 
             if (data.token) {
                 const role = data.user.role || userData.role || 'student';
-                Auth.setSession(data.token, role);
+                const fullName = data.user.full_name || userData.full_name;
+                Auth.setSession(data.token, role, fullName);
                 return { success: true, role: role };
             } else {
                 return { success: true, role: userData.role }; // Just created, maybe no token? But SignupView returns token.

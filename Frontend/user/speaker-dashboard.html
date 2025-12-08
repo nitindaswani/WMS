@@ -89,8 +89,23 @@
         if (!Auth.isAuthenticated() || Auth.getRole() !== 'speaker') window.location.href = '/user/login.html';
 
         async function init() {
+            // Ensure User Name is available
+            let userName = localStorage.getItem('user_full_name');
+            if (!userName || userName === 'Student') { // 'Student' might be default, but for speaker it should be their name
+                try {
+                    const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/auth/user/`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        userName = data.full_name || 'Speaker';
+                        localStorage.setItem('user_full_name', userName);
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch user profile:", e);
+                }
+            }
+
             // User Name
-            document.querySelector('.page-subtitle').innerText = `Welcome back, ${localStorage.getItem('user_full_name')}`;
+            document.querySelector('.page-subtitle').innerText = `Welcome back, ${userName || 'Speaker'}`;
 
             // Load Analytics
             try {

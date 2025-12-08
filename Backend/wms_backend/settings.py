@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'wms_backend.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://neondb_owner:npg_Ba0XdRnD6jiA@ep-bold-lake-abi2x59x-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require',
+        default='postgresql://neondb_owner:npg_Ba0XdRnD6jiA@ep-bold-lake-abi2x59x-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
         conn_max_age=600,
         ssl_require=True
     )
@@ -156,4 +156,4 @@ REST_FRAMEWORK = {
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com', 'https://*.vercel.app']
+CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com', 'https://*.vercel.app', 'http://localhost:5050', 'http://127.0.0.1:5050']
