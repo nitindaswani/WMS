@@ -96,10 +96,47 @@
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/dom.js"></script>
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const workshopId = urlParams.get('id');
+
+        // Initialize
+        if (workshopId) {
+            document.querySelector('.page-title').textContent = 'Edit Workshop';
+            document.querySelector('.page-subtitle').textContent = 'Update details, dates, and budget.';
+            document.querySelector('button[type="submit"]').textContent = 'Update Workshop';
+            loadWorkshopDetails(workshopId);
+        }
+
+        async function loadWorkshopDetails(id) {
+            try {
+                const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/${id}/`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const form = document.getElementById('createWorkshopForm');
+
+                    form.querySelector('[name="title"]').value = data.title;
+                    form.querySelector('[name="category"]').value = data.category;
+                    form.querySelector('[name="description"]').value = data.description;
+                    form.querySelector('[name="start_date"]').value = data.start_date;
+                    form.querySelector('[name="end_date"]').value = data.end_date;
+                    form.querySelector('[name="seat_limit"]').value = data.seat_limit;
+                    form.querySelector('[name="budget"]').value = data.budget;
+                    form.querySelector('[name="venue"]').value = data.venue || '';
+
+                } else {
+                    alert('Failed to load workshop details');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Network Error');
+            }
+        }
+
         async function handleCreateWorkshop(e) {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
-            btn.textContent = 'Saving...';
+            const originalText = btn.textContent;
+            btn.textContent = workshopId ? 'Updating...' : 'Saving...';
             btn.disabled = true;
 
             const formData = new FormData(e.target);
@@ -109,25 +146,28 @@
             data.seat_limit = parseInt(data.seat_limit);
             data.budget = parseFloat(data.budget);
 
+            const method = workshopId ? 'PUT' : 'POST';
+            const url = workshopId ? `${CONFIG.API_BASE_URL}/workshops/${workshopId}/` : `${CONFIG.API_BASE_URL}/workshops/`;
+
             try {
-                const response = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/`, {
-                    method: 'POST',
+                const response = await Auth.authenticatedFetch(url, {
+                    method: method,
                     body: JSON.stringify(data)
                 });
 
                 if (response.ok) {
-                    alert('Workshop Created Successfully!');
+                    alert(workshopId ? 'Workshop Updated Successfully!' : 'Workshop Created Successfully!');
                     window.location.href = 'workshop-list.html';
                 } else {
                     const err = await response.json();
                     alert('Error: ' + JSON.stringify(err));
-                    btn.textContent = 'Create Workshop';
+                    btn.textContent = originalText;
                     btn.disabled = false;
                 }
             } catch (error) {
                 console.error(error);
                 alert('Network Error');
-                btn.textContent = 'Create Workshop';
+                btn.textContent = originalText;
                 btn.disabled = false;
             }
         }

@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-a++t7h@i_3g7swpr66ri&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.pythonanywhere.com').split(',')
 
 
 # Application definition
@@ -88,11 +88,11 @@ WSGI_APPLICATION = 'wms_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# NEON DB Connection
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://neondb_owner:npg_Ba0XdRnD6jiA@ep-bold-lake-abi2x59x-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require',
-        conn_max_age=600,
-        ssl_require=True
+        default='postgresql://neondb_owner:npg_Ba0XdRnD6jiA@ep-bold-lake-abi2x59x-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
+        conn_max_age=600
     )
 }
 
@@ -156,4 +156,12 @@ REST_FRAMEWORK = {
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com', 'https://*.vercel.app']
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.pythonanywhere.com', 
+    'https://*.pages.dev', 
+    'http://localhost:5050', 
+    'http://127.0.0.1:5050',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000'
+]
+
