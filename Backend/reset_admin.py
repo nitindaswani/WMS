@@ -4,7 +4,7 @@ import sys
 
 # Setup Django Environment
 sys.path.append(os.getcwd())
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wms_backend.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wms.settings')
 django.setup()
 
 from django.contrib.auth import get_user_model

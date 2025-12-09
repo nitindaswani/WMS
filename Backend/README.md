@@ -17,7 +17,7 @@ Production-ready backend for WMS using Python + Django.
 ### 2. Environment Setup
 ```bash
 # Clone repository
-cd wms_backend
+cd wms
 
 # Install Dependencies
 pip install -r ../requirements.txt

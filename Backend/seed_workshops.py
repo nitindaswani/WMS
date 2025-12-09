@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.utils import timezone
 import random
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "wms_backend.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "wms.settings")
 django.setup()
 
 from django.contrib.auth import get_user_model

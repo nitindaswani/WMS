@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'wms_backend.urls'
+ROOT_URLCONF = 'wms.urls'
 
 TEMPLATES = [
     {
@@ -82,7 +82,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'wms_backend.wsgi.application'
+WSGI_APPLICATION = 'wms.wsgi.application'
 
 
 # Database
