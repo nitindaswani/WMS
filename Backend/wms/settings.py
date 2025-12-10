@@ -162,6 +162,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5050', 
     'http://127.0.0.1:5050',
     'http://localhost:8000',
-    'http://127.0.0.1:8000'
+    'http://127.0.0.1:8000',
+    'https://*.netlify.app'
 ]
 
