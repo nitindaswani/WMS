@@ -89,11 +89,15 @@ WSGI_APPLICATION = 'wms.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 # NEON DB Connection
+# MySQL Database Connection (PythonAnywhere)
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://neondb_owner:npg_Ba0XdRnD6jiA@ep-bold-lake-abi2x59x-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'NitinDaswani2025$wms',
+        'USER': 'NitinDaswani2025',
+        'PASSWORD': 'n7339714141',
+        'HOST': 'NitinDaswani2025.mysql.pythonanywhere-services.com',
+    }
 }
 
 
