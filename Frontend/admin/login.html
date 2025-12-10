@@ -71,6 +71,9 @@
     <script src="../public/js/config.js"></script>
     <script src="../public/js/auth.js"></script>
     <script>
+        // DEBUG: Check if we have the correct API URL
+        // alert('Current API URL: ' + CONFIG.API_BASE_URL);
+
         async function handleAdminLogin(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
