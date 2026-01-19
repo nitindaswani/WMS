@@ -1,152 +1,135 @@
 /**
- * Authentication Helper
- * Handles login, logout, and authenticated requests.
+ * Auth Service (JWT Edition)
+ * Handles Token Management (Access/Refresh) and Requests.
  */
+class Auth {
+    static getAccessToken() { return localStorage.getItem('access_token'); }
+    static getRefreshToken() { return localStorage.getItem('refresh_token'); }
+    static getUser() {
+        const user = localStorage.getItem('user');
+        try {
+            return user ? JSON.parse(user) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+    static getRole() { return localStorage.getItem('user_role'); }
 
-    },
+    static isAuthenticated() {
+        return !!this.getAccessToken();
+    }
 
-// Get token
-getToken: () => {
-    return localStorage.getItem('auth_token');
-},
+    /**
+     * Login: Fetches JWT Pair
+     */
+    static async login(email, password) {
+        try {
+            const res = await fetch(`${CONFIG.API_BASE_URL}/token/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }) // Using 'email' as username field if backend expects it, or map appropriately
+            });
 
-    // Get role
-    getRole: () => {
-        return localStorage.getItem('auth_role');
-    },
+            if (res.ok) {
+                const data = await res.json();
+                this.setSession(data);
 
-        // Remove session
-        clearSession: () => {
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('auth_role');
-            localStorage.removeItem('user_full_name');
-        },
+                // Fetch User Profile to get Role/Name
+                await this.fetchProfile();
+                return { success: true };
+            } else {
+                return { success: false, error: 'Invalid credentials' };
+            }
+        } catch (e) {
+            console.error("Login Error:", e);
+            return { success: false, error: 'Network error' };
+        }
+    }
 
-            // Check if user is logged in
-            isAuthenticated: () => {
-                return !!localStorage.getItem('auth_token');
-            },
+    static setSession(data) {
+        if (data.access) localStorage.setItem('access_token', data.access);
+        if (data.refresh) localStorage.setItem('refresh_token', data.refresh);
+    }
 
-                // Login function
-                login: async (email, password, role) => {
-                    try {
-                        const body = { username: email, password };
-                        if (role) body.role = role;
+    static async fetchProfile() {
+        // We assume an endpoint exists to get the current user details
+        const res = await this.authenticatedFetch(`${CONFIG.API_BASE_URL}/auth/user/`);
+        if (res.ok) {
+            const user = await res.json();
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('user_role', user.role || 'student');
+            localStorage.setItem('user_full_name', user.full_name || 'User');
+        }
+    }
 
-                        const response = await fetch(`${CONFIG.API_BASE_URL}/auth/login/`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(body),
-                        });
+    static logout() {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('user_role');
+        localStorage.removeItem('user_full_name');
+        window.location.href = '/index.html';
+    }
 
-                        const data = await response.json();
+    /**
+     * Authenticated Fetch Wrapper
+     * auto-refreshes token on 401
+     */
+    static async authenticatedFetch(url, options = {}) {
+        let token = this.getAccessToken();
 
-                        if (!response.ok) {
-                            // If the error suggests "Invalid credentials", we should return that cleanly.
-                            const errorMsg = data.non_field_errors ? data.non_field_errors[0] : (data.error || 'Login failed');
-                            throw new Error(errorMsg);
-                        }
+        let headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...options.headers
+        };
 
-                        // Expecting: { token: '...', user_id: 1, email: '...', role: 'student' }
-                        if (data.token) {
-                            const userRole = data.role || 'student';
-                            Auth.setSession(data.token, userRole, data.full_name);
-                            return { success: true, role: userRole };
-                        } else {
-                            return { success: false, error: 'No token received from server' };
-                        }
+        let response = await fetch(url, { ...options, headers });
 
-                    } catch (error) {
-                        return { success: false, error: error.message };
-                    }
-                },
+        // If 401, try to refresh
+        if (response.status === 401) {
+            console.log("Token expired, attempting refresh...");
+            const refreshSuccess = await this.refreshToken();
 
-                    // Signup function
-                    signup: async (userData) => {
-                        try {
-                            const response = await fetch(`${CONFIG.API_BASE_URL}/auth/signup/`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(userData),
-                            });
+            if (refreshSuccess) {
+                // Retry with new token
+                token = this.getAccessToken();
+                headers['Authorization'] = `Bearer ${token}`;
+                response = await fetch(url, { ...options, headers });
+            } else {
+                // Refresh failed
+                this.logout();
+                return response;
+            }
+        }
 
-                            const data = await response.json();
+        return response;
+    }
 
-                            if (!response.ok) {
-                                // Handle different types of errors (e.g., validation errors)
-                                let errorMsg = 'Signup failed';
-                                if (data.email) errorMsg = `Email: ${data.email[0]}`;
-                                else if (data.password) errorMsg = `Password: ${data.password[0]}`;
-                                else if (data.error) errorMsg = data.error;
+    static async refreshToken() {
+        const refresh = this.getRefreshToken();
+        if (!refresh) return false;
 
-                                throw new Error(errorMsg);
-                            }
+        try {
+            const res = await fetch(`${CONFIG.API_BASE_URL}/token/refresh/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh })
+            });
 
-                            if (data.token) {
-                                const role = data.user.role || userData.role || 'student';
-                                const fullName = data.user.full_name || userData.full_name;
-                                Auth.setSession(data.token, role, fullName);
-                                return { success: true, role: role };
-                            } else {
-                                return { success: true, role: userData.role }; // Just created, maybe no token? But SignupView returns token.
-                            }
+            if (res.ok) {
+                const data = await res.json();
+                localStorage.setItem('access_token', data.access);
+                // Some backends rotate refresh tokens too
+                if (data.refresh) localStorage.setItem('refresh_token', data.refresh);
+                return true;
+            }
+        } catch (e) {
+            console.error("Refresh Logic Error:", e);
+        }
+        return false;
+    }
+}
 
-                        } catch (error) {
-                            return { success: false, error: error.message };
-                        }
-                    },
-
-                        // Logout function
-                        logout: () => {
-                            const role = Auth.getRole();
-                            Auth.clearSession();
-                            if (role === 'admin') {
-                                window.location.href = '/admin/login.html';
-                            } else {
-                                window.location.href = '/user/login.html';
-                            }
-                        },
-
-                            // Helper to get dashboard URL based on role
-                            getDashboardURL: (role) => {
-                                switch (role) {
-                                    case 'admin': return '/admin/dashboard.html'; // Assuming admin folder structure
-                                    case 'speaker': return '/user/speaker-dashboard.html';
-                                    case 'student': return '/user/dashboard.html';
-                                    default: return '/user/dashboard.html';
-                                }
-                            },
-
-                                // Wrapper for fetch that adds the Authorization header
-                                authenticatedFetch: async (url, options = {}) => {
-                                    const token = Auth.getToken();
-
-                                    const headers = {
-                                        'Content-Type': 'application/json',
-                                        ...options.headers,
-                                    };
-
-                                    if (token) {
-                                        headers['Authorization'] = `Token ${token}`;
-                                    }
-
-                                    const config = {
-                                        ...options,
-                                        headers,
-                                    };
-
-                                    const response = await fetch(url, config);
-
-                                    if (response.status === 401) {
-                                        // Token expired or invalid
-                                        Auth.logout();
-                                    }
-
-                                    return response;
-                                }
-};
-
+// Global Export
+window.Auth = Auth;
