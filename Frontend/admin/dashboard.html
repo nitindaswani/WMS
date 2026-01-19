@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="../public/css/layout.css">
     <link rel="stylesheet" href="../public/css/components.css">
     <link rel="stylesheet" href="../public/css/animations.css">
+    <link rel="stylesheet" href="../public/css/loader.css">
+    <link rel="stylesheet" href="../public/css/toast.css">
 </head>
 
 <body>
@@ -26,7 +28,7 @@
             <div class="section-header fade-in">
                 <div>
                     <h1 class="page-title">Dashboard</h1>
-                    <p class="page-subtitle">Welcome back, Admin. Here's what's happening today.</p>
+                    <p class="page-subtitle skeleton-text" id="welcome-text" style="width:300px;">Welcome back...</p>
                 </div>
                 <button class="btn btn-primary" onclick="window.location.href='create-workshop.html'">
                     <svg class="icon">
@@ -54,7 +56,8 @@
                         </div>
                     </div>
                     <div class="stat-value" id="stat-workshops"
-                        style="font-size: 2rem; font-weight: 700; color: var(--text-highlight); margin-bottom: 4px;">-
+                        style="font-size: 2rem; font-weight: 700; color: var(--text-highlight); margin-bottom: 4px;">
+                        <div class="skeleton" style="width: 50px; height: 32px;"></div>
                     </div>
                     <div class="stat-label" style="color: var(--text-muted);">Active Workshops</div>
                 </div>
@@ -74,7 +77,8 @@
                         </div>
                     </div>
                     <div class="stat-value" id="stat-participants"
-                        style="font-size: 2rem; font-weight: 700; color: var(--text-highlight); margin-bottom: 4px;">-
+                        style="font-size: 2rem; font-weight: 700; color: var(--text-highlight); margin-bottom: 4px;">
+                        <div class="skeleton" style="width: 50px; height: 32px;"></div>
                     </div>
                     <div class="stat-label" style="color: var(--text-muted);">Total Participants</div>
                 </div>
@@ -93,7 +97,8 @@
                     </div>
                     <div class="stat-value" id="stat-budget"
                         style="font-size: 2rem; font-weight: 700; color: var(--text-highlight); margin-bottom: 4px;">
-                        $0</div>
+                        <div class="skeleton" style="width: 80px; height: 32px;"></div>
+                    </div>
                     <div class="stat-label" style="color: var(--text-muted);">Budget Utilization</div>
                 </div>
 
@@ -138,8 +143,10 @@
                         <h3 class="card-title">Upcoming Workshops</h3>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 16px;" id="upcoming-container">
-                        <!-- Items -->
-                        <div style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</div>
+                        <!-- Items Skeletons -->
+                        <div class="skeleton" style="height: 70px; border-radius: 12px;"></div>
+                        <div class="skeleton" style="height: 70px; border-radius: 12px;"></div>
+                        <div class="skeleton" style="height: 70px; border-radius: 12px;"></div>
                     </div>
                     <a href="workshop-list.html"
                         style="font-size: 0.9rem; color: var(--primary); text-align: center; margin-top: 8px;">View
@@ -150,29 +157,64 @@
         </main>
     </div>
 
+    <!-- Scripts -->
     <script src="../public/js/config.js"></script>
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/dom.js"></script>
+    <script src="../public/js/components.js"></script>
+    <script src="../public/js/toast.js"></script>
+
     <script>
         // Auth Check
         if (!Auth.isAuthenticated() || Auth.getRole() !== 'admin') {
             window.location.href = 'login.html';
         }
 
-        // Dynamic Profile Load
-        const fullName = localStorage.getItem('user_full_name') || 'Admin';
-        document.querySelector('.page-subtitle').innerText = `Welcome back, ${fullName}. Here's what's happening today.`;
+        async function initPage() {
+            try {
+                // 1. Load Components
+                await Promise.all([
+                    Components.load('sidebar', '/components/sidebar-admin.html'),
+                    Components.load('navbar', '/components/admin-navbar.html')
+                ]);
 
-        async function loadDashboard() {
+                // 2. Load Profile
+                renderProfile();
+
+                // 3. Load Data
+                loadDashboardData();
+            } catch (err) {
+                console.error("Init failed:", err);
+                Toast.error("Failed to initialize dashboard");
+            }
+        }
+
+        function renderProfile() {
+            const fullName = localStorage.getItem('user_full_name') || 'Admin';
+            const subtitle = document.getElementById('welcome-text');
+            subtitle.innerText = `Welcome back, ${fullName}. Here's what's happening today.`;
+            subtitle.classList.remove('skeleton-text');
+            subtitle.style.width = 'auto';
+
+            if (document.getElementById('nav-user-name')) {
+                document.getElementById('nav-user-name').innerText = fullName;
+            }
+        }
+
+        async function loadDashboardData() {
             try {
                 const res = await Auth.authenticatedFetch(`${CONFIG.API_BASE_URL}/workshops/analytics/`);
                 if (res.ok) {
                     const data = await res.json();
                     updateStats(data);
-                    updateUpcoming(data.upcoming);
+                    updateUpcoming(data.upcoming || data.upcoming_workshops); // Handle potential API key diff
+                } else {
+                    throw new Error("API Error " + res.status);
                 }
             } catch (e) {
                 console.error("Dashboard Load Error", e);
+                Toast.warning("Could not refresh live data.");
+                document.getElementById('upcoming-container').innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:10px;">Failed to load.</p>`;
             }
         }
 
@@ -193,7 +235,7 @@
             container.innerHTML = '';
 
             if (!list || list.length === 0) {
-                container.innerHTML = '<div style="text-align:center;color:var(--text-muted);">No upcoming workshops</div>';
+                container.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">No upcoming workshops</div>';
                 return;
             }
 
@@ -203,7 +245,7 @@
                 const day = date.getDate();
 
                 const div = document.createElement('div');
-                div.className = 'float-hover'; // Add hover effect
+                div.className = 'float-hover';
                 div.style.display = 'flex';
                 div.style.gap = '16px';
                 div.style.alignItems = 'center';
@@ -230,7 +272,9 @@
                 container.appendChild(div);
             });
         }
-        loadDashboard();
+
+        // Start
+        initPage();
     </script>
 </body>
 

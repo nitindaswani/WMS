@@ -7,3 +7,5 @@ qrcode
 mysqlclient
 gunicorn
 whitenoise
+djangorestframework-simplejwt
+python-decouple

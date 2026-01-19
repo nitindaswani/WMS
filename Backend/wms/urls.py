@@ -4,6 +4,10 @@ from django.views.static import serve
 from django.conf import settings
 from attendance.views import UserRegistrationsList
 from pathlib import Path
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 # Link directly to the external frontend folder for live updates
 # Link directly to the external frontend folder for live updates
@@ -13,7 +17,9 @@ urlpatterns = [
     # Renamed Django Admin to avoid conflict with frontend 'admin' folder
     path('django-admin/', admin.site.urls),
     
-    # APIs
+    # APIs (Auth)
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/', include('accounts.urls')),
     path('api/workshops/', include('workshops.urls')),
     path('api/attendance/', include('attendance.urls')),

@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="public/css/layout.css">
     <link rel="stylesheet" href="public/css/components.css">
     <link rel="stylesheet" href="public/css/animations.css">
+    <link rel="stylesheet" href="public/css/loader.css">
+    <link rel="stylesheet" href="public/css/toast.css">
     <style>
         .hero {
             display: flex;
@@ -50,16 +52,25 @@
 
 <body>
 
+    <!-- Optional Public Navbar Injector -->
+    <!-- <div id="public-navbar"></div> -->
+
     <div class="hero">
         <h1 class="hero-title">Next-Gen Workshop Management</h1>
         <p class="hero-subtitle">Streamline your events, manage attendees, and generate certificates with the most
             advanced WMS dashboard.</p>
 
         <div class="hero-actions">
-            <a href="/admin/login.html" class="btn btn-primary pulse-glow">Admin Login</a>
-            <a href="/user/login.html" class="btn btn-outline">User Login / Sign Up</a>
+            <a href="admin/login.html" class="btn btn-primary pulse-glow">Admin Login</a>
+            <a href="user/login.html" class="btn btn-outline">User Login / Sign Up</a>
         </div>
     </div>
+
+    <script src="public/js/toast.js"></script>
+    <script>
+        // Example: simple entrance animation or toast
+        // Toast.info("Welcome to WMS Pro");
+    </script>
 
 </body>
 
