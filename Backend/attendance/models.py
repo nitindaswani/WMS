@@ -23,8 +23,14 @@ class Attendance(models.Model):
     registration = models.ForeignKey(Registration, on_delete=models.CASCADE, related_name='attendance_records')
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, blank=True, related_name='attendance_records')
     timestamp = models.DateTimeField(auto_now_add=True)
-    qr_secret = models.CharField(max_length=255, blank=True, null=True) # The secret from the QR code used
+    qr_secret = models.CharField(max_length=255, blank=True, null=True)
     is_present = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('registration', 'session')
+        indexes = [
+            models.Index(fields=['timestamp']),
+        ]
 
     def __str__(self):
         return f"Attendance {self.registration.user.full_name} at {self.timestamp}"
