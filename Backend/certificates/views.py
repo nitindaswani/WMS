@@ -14,7 +14,7 @@ class UserCertificatesList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Certificate.objects.filter(registration__user=self.request.user)
+        return Certificate.objects.filter(registration__user=self.request.user).select_related('registration', 'registration__workshop', 'registration__user')
 
 class GenerateCertificateView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]

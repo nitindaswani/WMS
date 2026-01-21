@@ -4,8 +4,6 @@ django-cors-headers
 Pillow
 reportlab
 qrcode
-dj-database_url
-mysqlclient
 gunicorn
 whitenoise
 djangorestframework-simplejwt

@@ -40,8 +40,7 @@ class CustomLoginView(ObtainAuthToken):
             if request_role == 'admin':
                 if user.role != 'admin':
                     return Response({"error": "Unauthorized: You are not an admin."}, status=status.HTTP_401_UNAUTHORIZED)
-                if user.email != 'nitindaswani771@gmail.com':
-                    return Response({"error": "Unauthorized: Invalid admin credentials."}, status=status.HTTP_401_UNAUTHORIZED)
+                # Removed hardcoded email check
             elif request_role == 'speaker' and user.role != 'speaker':
                  return Response({"error": "Unauthorized: You are not a speaker."}, status=status.HTTP_401_UNAUTHORIZED)
             elif request_role == 'student' and user.role != 'student':

@@ -1,10 +1,19 @@
 /**
  * Global Configuration
  * 
- * CHANGE THIS URL TO YOUR DEPLOYED BACKEND URL
- * For local development: http://localhost:8000
- * For PythonAnywhere: https://<your-username>.pythonanywhere.com
+ * Auto-detects environment:
+ * - Localhost -> Local Backend
+ * - Production -> PythonAnywhere Backend
  */
+
+const getApiBaseUrl = () => {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://127.0.0.1:8000/api';
+    }
+    return 'https://nitindaswani2025.pythonanywhere.com/api';
+};
+
 const CONFIG = {
-    API_BASE_URL: 'https://nitindaswani2025.pythonanywhere.com/api'
+    API_BASE_URL: getApiBaseUrl()
 };
