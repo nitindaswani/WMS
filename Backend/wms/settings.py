@@ -90,23 +90,31 @@ WSGI_APPLICATION = 'wms.wsgi.application'
 
 # NEON DB Connection
 # MySQL Database Connection (PythonAnywhere)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'NitinDaswani2025$wms',
-        'USER': 'NitinDaswani2025',
-        'PASSWORD': 'n7339714141',
-        'HOST': 'NitinDaswani2025.mysql.pythonanywhere-services.com',
-    }
-}
-
-# LOCAL TESTING (SQLite)
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'NitinDaswani2025$wms',
+#         'USER': 'NitinDaswani2025',
+#         'PASSWORD': 'n7339714141',
+#         'HOST': 'NitinDaswani2025.mysql.pythonanywhere-services.com',
 #     }
 # }
+
+# Database Configuration
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL')
+        )
+    }
+else:
+    # LOCAL TESTING (SQLite)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation

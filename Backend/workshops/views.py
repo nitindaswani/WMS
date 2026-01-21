@@ -20,7 +20,7 @@ class WorkshopListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
     
     def get_queryset(self):
-        queryset = Workshop.objects.all()
+        queryset = Workshop.objects.select_related('speaker', 'created_by').prefetch_related('sessions')
         speaker_id = self.request.query_params.get('speaker_id')
         if speaker_id:
              return queryset.filter(speaker_id=speaker_id)
@@ -35,7 +35,7 @@ class WorkshopListCreateView(generics.ListCreateAPIView):
         serializer.save(created_by=self.request.user)
 
 class WorkshopDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Workshop.objects.all()
+    queryset = Workshop.objects.select_related('speaker', 'created_by').prefetch_related('sessions')
     serializer_class = WorkshopSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
     lookup_field = 'id'
@@ -126,7 +126,7 @@ class AnalyticsView(views.APIView):
             # DRF Response handles datetime usually.
             
             # Upcoming
-            upcoming = Workshop.objects.filter(start_date__gte=timezone.now().date()).order_by('start_date')[:5]
+            upcoming = Workshop.objects.filter(start_date__gte=timezone.now().date()).select_related('speaker', 'created_by').prefetch_related('sessions').order_by('start_date')[:5]
             data['upcoming'] = WorkshopSerializer(upcoming, many=True).data
             
         elif user.role == 'speaker':
@@ -134,7 +134,7 @@ class AnalyticsView(views.APIView):
             data['total_sessions'] = Session.objects.filter(workshop__speaker=user).count()
             
             # Upcoming sessions where speaker is involved
-            upcoming_workshops = Workshop.objects.filter(speaker=user, start_date__gte=timezone.now().date()).order_by('start_date')[:5]
+            upcoming_workshops = Workshop.objects.filter(speaker=user, start_date__gte=timezone.now().date()).select_related('speaker', 'created_by').prefetch_related('sessions').order_by('start_date')[:5]
             data['upcoming'] = WorkshopSerializer(upcoming_workshops, many=True).data
             
         elif user.role == 'student':
@@ -142,7 +142,10 @@ class AnalyticsView(views.APIView):
             data['certificates'] = 0 # Placeholder until Certificate model exists
             
             # My upcoming
-            my_regs = Registration.objects.filter(user=user, workshop__start_date__gte=timezone.now().date()).order_by('workshop__start_date')[:5]
+            my_regs = Registration.objects.filter(user=user, workshop__start_date__gte=timezone.now().date())\
+                .select_related('workshop', 'workshop__speaker', 'workshop__created_by')\
+                .prefetch_related('workshop__sessions')\
+                .order_by('workshop__start_date')[:5]
             data['upcoming'] = [reg.workshop.title for reg in my_regs] # Simplified list or full workshop data?
             # Let's return full workshop data for display cards
             workshops = [reg.workshop for reg in my_regs]
