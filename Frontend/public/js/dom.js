@@ -3,6 +3,19 @@
  * Fetches HTML fragments and injects them into specific DOM elements.
  */
 
+
+
+// Security Utility
+window.escapeHTML = function (str) {
+    if (!str) return '';
+    return str.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+};
+
 async function loadComponent(elementId, componentPath) {
     const element = document.getElementById(elementId);
     if (!element) return;

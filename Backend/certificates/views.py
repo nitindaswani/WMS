@@ -14,7 +14,7 @@ class UserCertificatesList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Certificate.objects.filter(registration__user=self.request.user).select_related('registration', 'registration__workshop', 'registration__user')
+        return Certificate.objects.filter(registration__user=self.request.user).select_related('registration', 'registration__workshop__speaker', 'registration__user')
 
 class GenerateCertificateView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -26,9 +26,20 @@ class GenerateCertificateView(views.APIView):
         if request.user != registration.user and request.user.role != 'admin':
              return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
              
-        # Check Attendance
-        if not Attendance.objects.filter(registration=registration, is_present=True).exists():
-             return Response({"error": "Cannot generate certificate. Attendance not marked."}, status=status.HTTP_400_BAD_REQUEST)
+        # Check Attendance (Must attend ALL sessions)
+        workshop_sessions_count = registration.workshop.sessions.count()
+        attended_sessions_count = Attendance.objects.filter(registration=registration, is_present=True).count()
+        
+        # If workshop has sessions, ensuring attendance matches.
+        # If 0 sessions defined (e.g. 1-day event without sessions), fall back to checking if ANY attendance exists (maybe check-in).
+        if workshop_sessions_count > 0:
+            if attended_sessions_count < workshop_sessions_count:
+                 return Response({
+                     "error": f"Incomplete attendance. Attended {attended_sessions_count}/{workshop_sessions_count} sessions."
+                 }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+             if not Attendance.objects.filter(registration=registration, is_present=True).exists():
+                 return Response({"error": "Cannot generate certificate. Attendance not marked."}, status=status.HTTP_400_BAD_REQUEST)
              
         # Check existing
         if hasattr(registration, 'certificate'):

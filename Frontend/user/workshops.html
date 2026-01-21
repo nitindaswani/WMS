@@ -83,15 +83,15 @@
 
                         card.innerHTML = `
                              <div style="height: 140px; background: ${bgGradient}; border-radius: var(--radius-md); margin-bottom: 16px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.5rem;">
-                                ${w.category || 'Workshop'}
+                                ${escapeHTML(w.category || 'Workshop')}
                             </div>
-                            <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;">${w.title}</h3>
+                            <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;">${escapeHTML(w.title)}</h3>
                             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; flex-grow: 1;">
-                                ${w.description ? w.description.substring(0, 80) + '...' : 'No description'}
+                                ${w.description ? escapeHTML(w.description).substring(0, 100) + '...' : 'No description'}
                             </p>
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                                <span class="badge badge-primary">${w.start_date}</span>
-                                <span style="font-weight: 600; color: var(--teal);">$${w.budget}</span>
+                                <span class="badge badge-primary">${escapeHTML(w.start_date)}</span>
+                                <span style="font-weight: 600; color: var(--teal);">$${escapeHTML(String(w.budget))}</span>
                             </div>
                             <a href="workshop-details.html?id=${w.id}" class="btn btn-outline" style="width: 100%;">View Details</a>
                         `;

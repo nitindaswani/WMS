@@ -14,21 +14,21 @@ class UserRegistrationsList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Registration.objects.filter(user=self.request.user)
+        return Registration.objects.filter(user=self.request.user).select_related('workshop', 'workshop__speaker')
 
 class UserAttendanceList(generics.ListAPIView):
     serializer_class = AttendanceSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Attendance.objects.filter(registration__user=self.request.user)
+        return Attendance.objects.filter(registration__user=self.request.user).select_related('registration', 'registration__workshop', 'session')
 
 class GenerateQRCodeView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, registration_id):
         # Allow user to view their own QR, or Admin
-        registration = get_object_or_404(Registration, id=registration_id)
+        registration = get_object_or_404(Registration.objects.select_related('user', 'workshop'), id=registration_id)
         if request.user != registration.user and request.user.role != 'admin':
             return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
         
@@ -63,8 +63,8 @@ class MarkAttendanceView(views.APIView):
         try:
             data = signing.loads(qr_content, max_age=86400) # 1 day validity?
             registration_id = data.get('registration_id')
-        except signing.BadSignature:
-            return Response({"error": "Invalid QR Code"}, status=status.HTTP_400_BAD_REQUEST)
+        except (signing.BadSignature, signing.SignatureExpired, ValueError, AttributeError):
+            return Response({"error": "Invalid or Expired QR Code"}, status=status.HTTP_400_BAD_REQUEST)
         
         registration = get_object_or_404(Registration, id=registration_id)
         

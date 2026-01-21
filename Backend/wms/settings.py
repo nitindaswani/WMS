@@ -22,10 +22,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-a++t7h@i_3g7swpr66ri&2jpcn8$1@m#(8&0y8rtcj@@+f#___')
+import secrets
+SECRET_KEY = os.environ.get('SECRET_KEY', secrets.token_urlsafe(50))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.pythonanywhere.com').split(',')
 
@@ -42,7 +43,7 @@ INSTALLED_APPS = [
     
     # Third party
     'rest_framework',
-    'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     
     # Local apps
@@ -64,6 +65,26 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Security Headers
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+# CSRF & CORS
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.pythonanywhere.com', 
+    'https://*.pages.dev', 
+    'http://localhost:5050',
+    'http://localhost:8000',
+    'https://*.netlify.app',
+]
+# Add CSRF protection/token exposure for frontend
+CSRF_COOKIE_HTTPONLY = False # Allow frontend to read CSRF token if needed, or use separate endpoint
 
 ROOT_URLCONF = 'wms.urls'
 
@@ -88,23 +109,13 @@ WSGI_APPLICATION = 'wms.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# NEON DB Connection
-# MySQL Database Connection (PythonAnywhere)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'NitinDaswani2025$wms',
-#         'USER': 'NitinDaswani2025',
-#         'PASSWORD': 'n7339714141',
-#         'HOST': 'NitinDaswani2025.mysql.pythonanywhere-services.com',
-#     }
-# }
-
 # Database Configuration
 if os.environ.get('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL')
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=True
         )
     }
 else:

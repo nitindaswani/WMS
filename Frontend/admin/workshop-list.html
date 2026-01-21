@@ -116,12 +116,12 @@
                 }
 
                 tr.innerHTML = `
-                    <td style="font-weight: 600; color: var(--text-highlight);">${w.title}</td>
-                    <td>${w.start_date}</td>
+                    <td style="font-weight: 600; color: var(--text-highlight);">${escapeHTML(w.title)}</td>
+                    <td>${escapeHTML(w.start_date)}</td>
                     <td>${w.speaker ? 'Speaker Assigned' : 'No Speaker'}</td> <!-- Can be improved if we fetch speaker details or if API returns name -->
-                    <td>${w.category}</td>
+                    <td>${escapeHTML(w.category)}</td>
                     <td><span class="badge ${badgeClass}">${statusText}</span></td>
-                    <td>$${w.budget}</td>
+                    <td>$${escapeHTML(String(w.budget))}</td>
                     <td>
                         <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;"
                             onclick="window.location.href='create-workshop.html?id=${w.id}'">Manage</button>

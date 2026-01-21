@@ -108,9 +108,10 @@
 
                 const dateStr = new Date(reg.workshop_date).toLocaleDateString();
 
-                card = card.replace('React Masterclass', reg.workshop_title || 'Workshop');
-                card = card.replace('Started Oct 12, 2025', `${dateStr}`);
-                card = card.replace('Confirmed', reg.status || 'Registered');
+                // Security: Sanitize output
+                card = card.replace('React Masterclass', escapeHTML(reg.workshop_title || 'Workshop'));
+                card = card.replace('Started Oct 12, 2025', `${dateStr}`); // Date is safe
+                card = card.replace('Confirmed', escapeHTML(reg.status || 'Registered'));
                 card = card.replace('10:00 AM - 04:00 PM', 'Check Details');
                 card = card.replace('Tech Park, Hall A', 'Online/TBD');
 

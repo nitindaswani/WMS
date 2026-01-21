@@ -1,4 +1,4 @@
-Django>=4.2,<6.0
+Django>=5.0,<5.2
 djangorestframework
 django-cors-headers
 Pillow
@@ -9,4 +9,3 @@ mysqlclient
 gunicorn
 whitenoise
 djangorestframework-simplejwt
-python-decouple

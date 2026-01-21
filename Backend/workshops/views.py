@@ -1,5 +1,6 @@
 from rest_framework import generics, permissions, status, views
 from rest_framework.response import Response
+from django.db import transaction # Added
 from django.shortcuts import get_object_or_404
 from .models import Workshop, Session
 from .serializers import WorkshopSerializer, SessionSerializer
@@ -62,22 +63,25 @@ class RegisterUserView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, id, user_type):
-        workshop = get_object_or_404(Workshop, id=id)
-        
-        # Role Validation
-        if user_type == 'student' and request.user.role != 'student' and request.user.role != 'admin':
-             return Response({"error": "Only students can register as student"}, status=status.HTTP_403_FORBIDDEN)
-        if user_type == 'speaker' and request.user.role != 'speaker' and request.user.role != 'admin':
-             return Response({"error": "Only speakers can register as speaker"}, status=status.HTTP_403_FORBIDDEN)
-        
-        if Registration.objects.filter(user=request.user, workshop=workshop).exists():
-             return Response({"error": "Already registered"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if workshop.seat_limit > 0 and workshop.registrations.count() >= workshop.seat_limit:
-             return Response({"error": "Workshop is full"}, status=status.HTTP_400_BAD_REQUEST)
-
-        reg = Registration.objects.create(user=request.user, workshop=workshop, type=user_type)
-        return Response({"message": f"Registered as {user_type} successfully", "registration_id": reg.id}, status=status.HTTP_201_CREATED)
+        # Transactional block to prevent race conditions
+        with transaction.atomic():
+            # Lock the workshop row
+            workshop = get_object_or_404(Workshop.objects.select_for_update(), id=id)
+            
+            # Role Validation
+            if user_type == 'student' and request.user.role != 'student' and request.user.role != 'admin':
+                 return Response({"error": "Only students can register as student"}, status=status.HTTP_403_FORBIDDEN)
+            if user_type == 'speaker' and request.user.role != 'speaker' and request.user.role != 'admin':
+                 return Response({"error": "Only speakers can register as speaker"}, status=status.HTTP_403_FORBIDDEN)
+            
+            if Registration.objects.filter(user=request.user, workshop=workshop).exists():
+                 return Response({"error": "Already registered"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if workshop.seat_limit > 0 and workshop.registrations.count() >= workshop.seat_limit:
+                 return Response({"error": "Workshop is full"}, status=status.HTTP_400_BAD_REQUEST)
+    
+            reg = Registration.objects.create(user=request.user, workshop=workshop, type=user_type)
+            return Response({"message": f"Registered as {user_type} successfully", "registration_id": reg.id}, status=status.HTTP_201_CREATED)
 
 class AdminRegisterUserView(views.APIView):
     permission_classes = [permissions.IsAuthenticated, IsAdminOrReadOnly]

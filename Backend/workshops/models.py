@@ -62,12 +62,20 @@ class Session(models.Model):
     def __str__(self):
         return f"{self.session_title} ({self.workshop.title})"
 
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 class WorkshopRating(models.Model):
     workshop = models.ForeignKey(Workshop, on_delete=models.CASCADE, related_name='ratings')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    rating = models.PositiveIntegerField() # 1-5 validation can be in serializer
+    rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     feedback = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('workshop', 'user')
+        indexes = [
+            models.Index(fields=['rating']),
+        ]
 
     def __str__(self):
         return f"{self.rating} - {self.workshop.title}"

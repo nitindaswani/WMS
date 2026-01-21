@@ -72,11 +72,11 @@
                 if (res.ok) {
                     const user = await res.json();
 
-                    document.getElementById('profile-name').innerText = user.full_name || 'User';
+                    document.getElementById('profile-name').innerText = user.full_name || 'User'; // innerText is safe
                     document.getElementById('avatar-initials').innerText = (user.full_name || 'U').charAt(0).toUpperCase();
                     document.getElementById('profile-role').innerText = user.role.charAt(0).toUpperCase() + user.role.slice(1);
 
-                    document.getElementById('profile-email').value = user.email;
+                    document.getElementById('profile-email').value = user.email; // value is safe
                     document.getElementById('profile-role-display').value = user.role.toUpperCase();
                     // Joined date not in serializer? assuming 'date_joined' from django User model if serialized.
                     // If not available, placeholder. 

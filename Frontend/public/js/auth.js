@@ -27,7 +27,7 @@ class Auth {
             const res = await fetch(`${CONFIG.API_BASE_URL}/token/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }) // Using 'email' as username field if backend expects it, or map appropriately
+                body: JSON.stringify({ email, password })
             });
 
             if (res.ok) {
@@ -44,6 +44,40 @@ class Auth {
             console.error("Login Error:", e);
             return { success: false, error: 'Network error' };
         }
+    }
+
+    static async signup(userData) {
+        try {
+            const res = await fetch(`${CONFIG.API_BASE_URL}/accounts/signup/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                this.setSession(data);
+                await this.fetchProfile();
+                return { success: true, role: userData.role };
+            } else {
+                // Formatting backend errors
+                let errorMsg = 'Signup failed';
+                if (data.email) errorMsg = data.email[0];
+                else if (data.username) errorMsg = data.username[0];
+                else if (data.error) errorMsg = data.error;
+                return { success: false, error: errorMsg };
+            }
+        } catch (e) {
+            console.error(e);
+            return { success: false, error: 'Network Error' };
+        }
+    }
+
+    static getDashboardURL(role) {
+        if (role === 'admin') return '/admin/dashboard.html';
+        if (role === 'speaker') return '/user/speaker-profile.html';
+        return '/user/dashboard.html';
     }
 
     static setSession(data) {

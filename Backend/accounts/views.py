@@ -1,11 +1,42 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, SignupSerializer
+from django.conf import settings
+from .serializers import UserSerializer, SignupSerializer, CustomTokenObtainPairSerializer
 
 User = get_user_model()
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            access_token = response.data.get('access')
+            refresh_token = response.data.get('refresh')
+
+            # Set HttpOnly cookies
+            response.set_cookie(
+                'access_token',
+                access_token,
+                httponly=True,
+                secure=not settings.DEBUG, # True in production
+                samesite='Lax', # or 'None' if cross-site
+                max_age=3600 # 1 hour
+            )
+            response.set_cookie(
+                'refresh_token',
+                refresh_token,
+                httponly=True,
+                secure=not settings.DEBUG,
+                samesite='Lax',
+                max_age=86400 # 1 day
+            )
+        return response
+
 
 class SignupView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -20,10 +51,11 @@ class SignupView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        token, created = Token.objects.get_or_create(user=user)
+        refresh = RefreshToken.for_user(user)
         return Response({
             "user": UserSerializer(user).data,
-            "token": token.key
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
         }, status=status.HTTP_201_CREATED)
 
 class CustomLoginView(ObtainAuthToken):
@@ -46,9 +78,10 @@ class CustomLoginView(ObtainAuthToken):
             elif request_role == 'student' and user.role != 'student':
                  return Response({"error": "Unauthorized: You are not a student."}, status=status.HTTP_401_UNAUTHORIZED)
         
-        token, created = Token.objects.get_or_create(user=user)
+        refresh = RefreshToken.for_user(user)
         return Response({
-            'token': token.key,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
             'user_id': user.pk,
             'email': user.email,
             'role': user.role,

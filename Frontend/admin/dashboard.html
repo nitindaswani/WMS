@@ -158,8 +158,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="../public/js/config.js"></script>
-    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/config.js?v=1.1"></script>
+    <script src="../public/js/auth.js?v=1.1"></script>
     <script src="../public/js/dom.js"></script>
     <script src="../public/js/components.js"></script>
     <script src="../public/js/toast.js"></script>
@@ -265,8 +265,8 @@
                        <span style="font-size: 1.1rem; line-height:1;">${day}</span>
                    </div>
                    <div>
-                       <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-highlight); margin-bottom: 4px;">${item.title}</h4>
-                       <span class="badge badge-sm" style="background: rgba(255,255,255,0.1); color: var(--text-muted); padding: 2px 8px; font-size: 0.75rem;">${item.category || 'Workshop'}</span>
+                       <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-highlight); margin-bottom: 4px;">${escapeHTML(item.title)}</h4>
+                       <span class="badge badge-sm" style="background: rgba(255,255,255,0.1); color: var(--text-muted); padding: 2px 8px; font-size: 0.75rem;">${escapeHTML(item.category || 'Workshop')}</span>
                    </div>
                 `;
                 container.appendChild(div);

@@ -11,6 +11,10 @@ from rest_framework_simplejwt.views import (
 
 # Link directly to the external frontend folder for live updates
 # Link directly to the external frontend folder for live updates
+from accounts.views import CustomTokenObtainPairView
+
+# Link directly to the external frontend folder for live updates
+# Link directly to the external frontend folder for live updates
 FRONTEND_DIR = settings.BASE_DIR.parent / 'Frontend'
 
 urlpatterns = [
@@ -18,7 +22,7 @@ urlpatterns = [
     path('django-admin/', admin.site.urls),
     
     # APIs (Auth)
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/', include('accounts.urls')),
     path('api/workshops/', include('workshops.urls')),
