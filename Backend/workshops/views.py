@@ -146,6 +146,7 @@ class AnalyticsView(views.APIView):
                 .select_related('workshop', 'workshop__speaker', 'workshop__created_by')\
                 .prefetch_related('workshop__sessions')\
                 .order_by('workshop__start_date')[:5]
+            my_regs = Registration.objects.filter(user=user, workshop__start_date__gte=timezone.now().date()).select_related('workshop').order_by('workshop__start_date')[:5]
             data['upcoming'] = [reg.workshop.title for reg in my_regs] # Simplified list or full workshop data?
             # Let's return full workshop data for display cards
             workshops = [reg.workshop for reg in my_regs]
